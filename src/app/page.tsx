@@ -6,7 +6,6 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // Define the type for a musical note
 interface MusicalNote {
@@ -33,8 +32,29 @@ const musicalNotes: MusicalNote[] = [
 
 const initialTempo = 120;
 const initialRootNote = musicalNotes[0]; // Default to C3
-const initialMultiplier = 1;
+const initialMultiplier = 0.25;
 const initialSemitoneOffset = 0;
+
+const beatDivisions = [
+    "Dotted 1/2 note",
+    "1/2 note",
+    "1/2 note triplets",
+    "Dotted 1/4 note",
+    "1/4 note",
+    "1/4 note triplets",
+    "Dotted 1/8 note",
+    "1/8 note",
+    "1/8 note triplets",
+    "Dotted 1/16 note",
+    "1/16 note",
+    "1/16 note triplets",
+    "Dotted 1/32 note",
+    "1/32 note",
+    "1/32 note triplets",
+    "Dotted 1/64 note",
+    "1/64 note",
+    "1/64 note triplets"
+];
 
 // React functional component for the Home page
 export default function Home() {
@@ -48,7 +68,6 @@ export default function Home() {
   const [musicalDelayTime, setMusicalDelayTime] = useState<number>(timePerCycle * multiplier);
   const [beatTime, setBeatTime] = useState<number>(60000 / tempo);
   const [beatRatio, setBeatRatio] = useState<number>(musicalDelayTime / beatTime);
-    const [selectedDivision, setSelectedDivision] = useState<string>("1/4 note");
 
   // useEffect hook to recalculate values when tempo, root note, or multiplier changes
   useEffect(() => {
@@ -149,6 +168,11 @@ export default function Home() {
     );
   };
 
+    const handleMultiplierChange = (value: number[]) => {
+        const index = Math.round(value[0]);
+        setMultiplier(beatDivisionToMultiplier(beatDivisions[index]));
+    };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
       <main className="flex flex-col items-center justify-center w-full flex-1 px-4 sm:px-20 text-center">
@@ -241,34 +265,22 @@ export default function Home() {
               {/* Multiplier Input */}
               <div className="grid gap-2">
                 <Label htmlFor="multiplier">Beat Division</Label>
-                  <Select onValueChange={(value) => {
-                    setSelectedDivision(value);
-                    setMultiplier(beatDivisionToMultiplier(value));
-                  }}>
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Select a beat division" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Dotted 1/2 note">Dotted 1/2 note</SelectItem>
-                      <SelectItem value="1/2 note">1/2 note</SelectItem>
-                      <SelectItem value="1/2 note triplets">1/2 note triplets</SelectItem>
-                      <SelectItem value="Dotted 1/4 note">Dotted 1/4 note</SelectItem>
-                      <SelectItem value="1/4 note">1/4 note</SelectItem>
-                      <SelectItem value="1/4 note triplets">1/4 note triplets</SelectItem>
-                      <SelectItem value="Dotted 1/8 note">Dotted 1/8 note</SelectItem>
-                      <SelectItem value="1/8 note">1/8 note</SelectItem>
-                      <SelectItem value="1/8 note triplets">1/8 note triplets</SelectItem>
-                      <SelectItem value="Dotted 1/16 note">Dotted 1/16 note</SelectItem>
-                      <SelectItem value="1/16 note">1/16 note</SelectItem>
-                      <SelectItem value="1/16 note triplets">1/16 note triplets</SelectItem>
-                      <SelectItem value="Dotted 1/32 note">Dotted 1/32 note</SelectItem>
-                      <SelectItem value="1/32 note">1/32 note</SelectItem>
-                      <SelectItem value="1/32 note triplets">1/32 note triplets</SelectItem>
-                      <SelectItem value="Dotted 1/64 note">Dotted 1/64 note</SelectItem>
-                      <SelectItem value="1/64 note">1/64 note</SelectItem>
-                      <SelectItem value="1/64 note triplets">1/64 note triplets</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <Slider
+                  id="multiplier"
+                  min={0}
+                  max={beatDivisions.length - 1}
+                  step={1}
+                  defaultValue={[beatDivisions.indexOf("1/4 note")]}
+                  onValueChange={(value) => handleMultiplierChange(value)}
+                  aria-label="Beat Division"
+                />
+                <Input
+                  type="text"
+                  id="multiplier-input"
+                  className="w-full"
+                  value={beatDivisions[Math.round(multiplier / 100 * (beatDivisions.length - 1))] || "1/4 note"}
+                  readOnly
+                />
               </div>
               <Button type="button" onClick={handleReset}>
                 Reset
