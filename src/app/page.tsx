@@ -43,6 +43,16 @@ const chakraModes = {
     "B": { chakra: "Crown", color: "Violet", westernFreq: 246.94, solfeggioFreq: 963, energy: "Spirituality | Enlightenment | Connection" }
 };
 
+const sealPoints = {
+    "C": { label: "Foundation", emoji: "🟫", energy: "Grounding | Power | Presence" },
+    "D": { label: "Motion", emoji: "🌊", energy: "Flow | Desire | Creativity" },
+    "E": { label: "Drive", emoji: "🔥", energy: "Confidence | Action | Radiance" },
+    "F": { label: "Core", emoji: "💚", energy: "Connection | Compassion | Love" },
+    "G": { label: "Voice", emoji: "🎙", energy: "Truth | Expression | Clarity" },
+    "A": { label: "Vision", emoji: "🌀", energy: "Intuition | Insight | Perception" },
+    "B": { label: "Signal", emoji: "👑", energy: "Awareness | Unity | Divine Flow" }
+};
+
 const initialTempo = 120;
 const initialRootNote = musicalNotes[0];
 const initialMultiplier = 1;
@@ -172,10 +182,12 @@ export default function Home() {
         setBeatRatio(newBeatRatio);
         setClosestNoteDivision(getClosestNoteDivision(newBeatRatio));
 
-        const chakraData = chakraModes[rootNote.note[0]] as ChakraType;
-        setChakra(chakraData ? chakraData.chakra : "Unknown");
-        setChakraEnergy(chakraData ? chakraData.energy : "Unknown");
-        setChakraColor(chakraData ? chakraData.color : "grey");
+        const noteRoot = rootNote.note[0]; // Get first letter: C, D, etc.
+        const seal = sealPoints[noteRoot];
+
+        setChakra(seal ? seal.label : "Unknown");
+        setChakraEnergy(seal ? seal.energy : "Unknown");
+        //setChakraColor(seal ? seal.color : "grey");
 
         setScaleNotes(generateScale(rootNote.note[0], scaleType));
         setChordNotes(generateChord(rootNote.note[0], chordType));
@@ -265,6 +277,16 @@ export default function Home() {
     const sortNotesByFrequency = (notes: string[]): string[] => {
         return [...notes].sort((a, b) => (noteFrequencies[a] || 0) - (noteFrequencies[b] || 0));
     };
+
+    const getSealPointInfo = (note: string) => {
+        const root = note[0]; // handle "C#", "D#", etc.
+        return sealPoints[root] || {
+            label: "—",
+            emoji: "—",
+            energy: "—"
+        };
+    };
+
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
@@ -430,25 +452,19 @@ export default function Home() {
                                     ~ {closestNoteDivision} of a beat
                                 </div>
                             </div>
-                            <div className="grid gap-2">
-                                <Label>Chakra Alignment:</Label>
-                                <div className={cn(
-                                    "text-lg font-semibold",
-                                    {
-                                        "text-red-500": chakraColor === "Red",
-                                        "text-orange-500": chakraColor === "Orange",
-                                        "text-yellow-500": chakraColor === "Yellow",
-                                        "text-green-500": chakraColor === "Green",
-                                        "text-blue-500": chakraColor === "Blue",
-                                        "text-indigo-500": chakraColor === "Indigo",
-                                        "text-violet-500": chakraColor === "Violet",
-                                        "text-gray-500": chakraColor === "grey",
-                                    }
-                                )}>{chakra}</div>
-                            </div>
-                            <div className="grid gap-2">
-                                <Label>Chakra Energy:</Label>
-                                <div className="text-lg font-semibold text-lime-500">{chakraEnergy}</div>
+                             <div className="grid gap-2">
+                                <Label>SealPoint Alignment:</Label>
+                                <div className="text-lg font-semibold text-lime-500">
+                                    {(() => {
+                                        const sealPointInfo = getSealPointInfo(rootNote.note);
+                                        return (
+                                            <>
+                                                {sealPointInfo.emoji} {sealPointInfo.label}
+                                                <div>{sealPointInfo.energy}</div>
+                                            </>
+                                        );
+                                    })()}
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
@@ -593,6 +609,7 @@ function getMetaphysicalInfo(note: string) {
         energy: "—"
     };
 }
+
 
 
 
