@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Circle } from "lucide-react";
 
 // Define the type for a musical note
@@ -47,8 +46,9 @@ const initialTempo = 120;
 const initialRootNote = musicalNotes[6]; // Default to G3
 const initialMultiplier = 1;
 
+// React functional component for the Home page
 export default function Home() {
-  // State variables for tempo, root note, multiplier, and calculated values
+  // State variables using the useState hook
   const [tempo, setTempo] = useState<number>(initialTempo);
   const [rootNote, setRootNote] = useState<MusicalNote>(initialRootNote);
   const [multiplier, setMultiplier] = useState<number>(initialMultiplier);
@@ -86,12 +86,13 @@ export default function Home() {
     setMultiplier(initialMultiplier);
   };
 
-  const NoteButton = ({ note, frequency }: { note: string; frequency: number }) => (
+  // Piano key component
+  const PianoKey = ({ note, frequency, isBlack }: { note: string; frequency: number; isBlack: boolean }) => (
     <button
-      className="flex-1 p-2 rounded font-semibold text-sm text-center bg-secondary hover:bg-accent text-accent-foreground"
+      className={`relative z-10 h-24 ${isBlack ? 'w-6 bg-black text-white top-14 mx-1 z-20' : 'w-12 bg-white text-black border-2 border-gray-200'} rounded-b-md focus:outline-none hover:bg-accent hover:text-accent-foreground`}
       onClick={() => setRootNote({ note, frequency })}
     >
-      {note}
+      {/* {note} */}
     </button>
   );
 
@@ -109,16 +110,17 @@ export default function Home() {
               <CardTitle>Input Parameters</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4">
-            <div className="grid gap-2">
+              {/* Tempo Input */}
+              <div className="grid gap-2">
                 <Label htmlFor="tempo">Tempo (BPM)</Label>
                 <div className="flex items-center space-x-2">
                   <Slider
                     id="tempo"
                     min={30}
                     max={240}
-                    step={1}
+                    step={0.1}
                     defaultValue={[tempo]}
-                    onValueChange={(value) => setTempo(value[0])}
+                    onValueChange={(value) => setTempo(parseFloat(value[0].toFixed(1)))}
                     aria-label="Tempo in beats per minute"
                   />
                   <Input
@@ -139,22 +141,28 @@ export default function Home() {
                 </div>
               </div>
 
+              {/* Root Note Selection */}
               <div className="grid gap-2">
                 <Label>Root Note</Label>
-                <Sheet>
-                  <SheetTrigger className="w-full flex items-center justify-center h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-                    {rootNote.note} ({rootNote.frequency.toFixed(2)} Hz)
-                  </SheetTrigger>
-                  <SheetContent className="grid gap-4 p-4">
-                    <div className="grid grid-cols-6 gap-2">
-                      {musicalNotes.map((note) => (
-                        <NoteButton key={note.note} note={note.note} frequency={note.frequency} />
-                      ))}
-                    </div>
-                  </SheetContent>
-                </Sheet>
+                <div className="flex justify-center items-center py-4">
+                  {/* Piano Keyboard */}
+                  <div className="flex">
+                    {musicalNotes.map((note) => {
+                      const isBlackKey = note.note.includes("#") || note.note.includes("b");
+                      return (
+                        <PianoKey
+                          key={note.note}
+                          note={note.note}
+                          frequency={note.frequency}
+                          isBlack={isBlackKey}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
 
+              {/* Multiplier Input */}
               <div className="grid gap-2">
                 <Label htmlFor="multiplier">Multiplier</Label>
                 <div className="flex items-center space-x-2">
