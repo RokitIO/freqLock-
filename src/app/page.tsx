@@ -246,7 +246,7 @@ export default function Home() {
         const keyHeight = isBlack ? '3rem' : '5rem';
         const keyClass = isBlack ? 'bg-black text-white z-10 relative mx-[1px]' : 'bg-white text-black border-2 border-gray-200 relative mx-[1px]';
         const selectedClass = isSelected ? 'bg-accent text-accent-foreground' : 'hover:bg-accent hover:text-accent-foreground';
-
+        
         const isLocked = false;
         
                 return (
@@ -316,22 +316,22 @@ export default function Home() {
                 </h1>
                 <h2 className="text-lg md:text-2xl font-bold text-teal-800 mb-4">🔊🎚️ Harmonic Delay Calculator for Tuned Echo Perfection</h2>
 
-                <section className="flex flex-col gap-y-6">
+                <div className="flex flex-col space-y-6 p-4 max-w-md mx-auto">
                  {/* Input Section */}
-                    <Card className="mb-4">
+                    <Card className="p-4 rounded-lg shadow-md bg-white">
                         <CardHeader>
                             <CardTitle>Input Parameters</CardTitle>
                         </CardHeader>
-                        <CardContent className="grid gap-4">
+                        <CardContent className="grid gap-4 ">
                             {/* Tempo Input */}
-                            <div className="grid gap-2">
+                            <div className="grid gap-2 ">
                                 <Label htmlFor="tempo">Tempo (BPM)</Label>
                                 <div className="flex items-center space-x-2">
                                     <Slider
                                         id="tempo"
                                         min={30}
                                         max={240}
-                                        step={1}
+                                        step={1}                                        
                                         defaultValue={[tempo]}
                                         onValueChange={(value) => setTempo(parseFloat(value[0].toFixed(1)))}
                                         aria-label="Tempo in beats per minute"
@@ -342,20 +342,20 @@ export default function Home() {
                                         className="w-20"
                                         value={tempo.toString()}
                                         onChange={handleTempoChange}
-                                        min={30}                                                                       max={240}
+                                        min={30}
+                                        max={240}
                                         max={240}
                                         step={1}
                                     />
                                 </div>
                             </div>
-
                             {/* Root Note Selection */}
                             <div className="grid gap-2">
                                 <Label>Root Note</Label>
                                 <div className="flex justify-center items-center py-2">
                                     {/* Piano Keyboard */}
-                                    <div className="flex overflow-x-auto" style={{ width: 'fit-content', minWidth: '400px' }}>                                        
-
+                                    <div className="flex overflow-x-auto" style={{ width: 'fit-content', minWidth: '400px' }}>
+                                      
 
 
                                         {musicalNotes.map((note) => {
@@ -413,7 +413,7 @@ export default function Home() {
                                     <Select onValueChange={(value) => setSelectedMultiplier(parseFloat(value))}>
                                         <SelectTrigger className="w-full">
                                             <SelectValue placeholder="Select a multiplier" />
-                                        </SelectTrigger>
+                                        </SelectTrigger>                                        
                                         <SelectContent>
                                             {multipliers.map((multiplier) => (
                                                 <SelectItem key={multiplier.value} value={multiplier.value.toString()}>
@@ -447,9 +447,8 @@ export default function Home() {
                             </Button>
                         </CardContent>
                     </Card>
-
                     {/* Output Section */}                  
-                    <Card className="max-w-md mt-6">
+                    <Card className="p-4 rounded-lg shadow-md bg-white max-w-md">
                         <CardHeader>
                             <CardTitle>Calculated Results</CardTitle>
                         </CardHeader>
@@ -494,13 +493,13 @@ export default function Home() {
                     </Card>
 
                     {/* Scales Section */}
-                    <Card className="mb-4 max-w-md">
+                    <Card className="p-4 rounded-lg shadow-md bg-white max-w-md">
                         <CardHeader>
                             <CardTitle>Scale Generator</CardTitle>
                         </CardHeader>
-                        <CardContent className="grid gap-4">
-                            <div className="grid gap-2">
-                                <Label htmlFor="scaleType">Scale Type</Label>
+                        <CardContent className="grid gap-4">                           
+                           <div className="grid gap-2">                                
+                                <Label className="max-w-[150px]"htmlFor="scaleType">Scale Type</Label>
                                 <Select value={scaleType} onValueChange={(value) => setScaleType(value)}>
                                     <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Select a scale type" />
@@ -520,12 +519,12 @@ export default function Home() {
                             </div>
                         </CardContent>
                     </Card>
-
+                    
                     {/* Chords Section */}
-                    <Card className="mb-4 max-w-md mt-6">
+                    <Card className="p-4 rounded-lg shadow-md bg-white max-w-md">
                         <CardHeader>
                             <CardTitle>Chord Library</CardTitle>
-                        </CardHeader>
+                        </CardHeader>                        
                         <CardContent className="grid gap-4">
                             <div className="grid gap-2">
                                 <Label htmlFor="chordType">Chord Type</Label>
@@ -552,7 +551,8 @@ export default function Home() {
                             </div>
                         </CardContent>
                     </Card>
-                </section>
+                
+                </div>
             </main>
         </div>
     );
@@ -668,7 +668,3 @@ export function generateScale(root: string, mode: Mode) {
 }
 
 export type Mode = "major" | "minor" | "Dorian" | "Lydian" | "Phrygian";
-
-
-
-
