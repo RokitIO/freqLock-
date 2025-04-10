@@ -145,6 +145,11 @@ export default function Home() {
     const [chakraEnergy, setChakraEnergy] = useState<string>("");
     const [chakraColor, setChakraColor] = useState<string>("");
 
+    const [scaleNotes, setScaleNotes] = useState(['C', 'D', 'E', 'F', 'G', 'A', 'B']);
+    const [chordNotes, setChordNotes] = useState(['C', 'E', 'G']);
+    const [scaleType, setScaleType] = useState<string>("major");
+    const [chordType, setChordType] = useState<string>("major");
+
     // Recalculate values whenever inputs change
     useEffect(() => {
         const newFrequency = rootNote.frequency * Math.pow(2, semitoneOffset / 12);
@@ -165,7 +170,10 @@ export default function Home() {
         setChakra(chakraData ? chakraData.chakra : "Unknown");
         setChakraEnergy(chakraData ? chakraData.energy : "Unknown");
         setChakraColor(chakraData ? chakraData.color : "grey");
-    }, [tempo, rootNote, multiplier, semitoneOffset, selectedMultiplier, useHarmonicMultiples, beatDivisionIndex]);
+
+        setScaleNotes(generateScale("C", scaleType));
+        setChordNotes(generateChord("C", chordType));
+    }, [tempo, rootNote, multiplier, semitoneOffset, selectedMultiplier, useHarmonicMultiples, beatDivisionIndex, scaleType, chordType]);
 
     // Handlers
     const handleSemitoneOffsetChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -236,8 +244,8 @@ export default function Home() {
     }
 
     // Sample scale
-    const [scaleNotes, setScaleNotes] = useState(['C', 'D', 'E', 'F', 'G', 'A', 'B']);
-    const [chordNotes, setChordNotes] = useState(['C', 'E', 'G']);
+    //const [scaleNotes, setScaleNotes] = useState(['C', 'D', 'E', 'F', 'G', 'A', 'B']);
+    //const [chordNotes, setChordNotes] = useState(['C', 'E', 'G']);
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
@@ -433,8 +441,23 @@ export default function Home() {
                         </CardHeader>
                         <CardContent className="grid gap-4">
                             <div className="grid gap-2">
+                                <Label htmlFor="scaleType">Scale Type</Label>
+                                <Select onValueChange={(value) => setScaleType(value)}>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Select a scale type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="major">Major</SelectItem>
+                                        <SelectItem value="minor">Minor</SelectItem>
+                                        <SelectItem value="dorian">Dorian</SelectItem>
+                                        <SelectItem value="lydian">Lydian</SelectItem>
+                                        <SelectItem value="phrygian">Phrygian</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="grid gap-2">
                                 <Label>Scale Notes:</Label>
-                                <div>{scaleNotes.join(' - ')}</div>
+                                <div>{scaleNotes.map(note => `${note} (${noteFrequencies[note] || "N/A"} Hz)`).join(' - ')}</div>
                             </div>
                         </CardContent>
                     </Card>
@@ -446,8 +469,27 @@ export default function Home() {
                         </CardHeader>
                         <CardContent className="grid gap-4">
                             <div className="grid gap-2">
+                                <Label htmlFor="chordType">Chord Type</Label>
+                                <Select onValueChange={(value) => setChordType(value)}>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Select a chord type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="major">Major</SelectItem>
+                                        <SelectItem value="minor">Minor</SelectItem>
+                                        <SelectItem value="dim">Diminished</SelectItem>
+                                        <SelectItem value="aug">Augmented</SelectItem>
+                                        <SelectItem value="maj7">Major 7th</SelectItem>
+                                        <SelectItem value="min7">Minor 7th</SelectItem>
+                                        <SelectItem value="dom7">Dominant 7th</SelectItem>
+                                        <SelectItem value="sus2">Suspended 2nd</SelectItem>
+                                        <SelectItem value="sus4">Suspended 4th</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="grid gap-2">
                                 <Label>Chord Notes:</Label>
-                                <div>{chordNotes.join(' - ')}</div>
+                                <div>{chordNotes.map(note => `${note} (${noteFrequencies[note] || "N/A"} Hz)`).join(' - ')}</div>
                             </div>
                         </CardContent>
                     </Card>
@@ -548,3 +590,4 @@ function getMetaphysicalInfo(note: string) {
         energy: "—"
     };
 }
+
