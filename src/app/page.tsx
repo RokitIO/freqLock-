@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Circle } from "lucide-react";
 
 // Define the type for a musical note
 interface MusicalNote {
@@ -14,7 +13,7 @@ interface MusicalNote {
   frequency: number;
 }
 
-// List of musical notes with their frequencies
+// List of musical notes for one octave (C3 to C4)
 const musicalNotes: MusicalNote[] = [
   { note: "C3", frequency: 130.81 },
   { note: "C#3/Db3", frequency: 138.59 },
@@ -29,21 +28,10 @@ const musicalNotes: MusicalNote[] = [
   { note: "A#3/Bb3", frequency: 233.08 },
   { note: "B3", frequency: 246.94 },
   { note: "C4", frequency: 261.63 },
-  { note: "C#4/Db4", frequency: 277.18 },
-  { note: "D4", frequency: 293.66 },
-  { note: "D#4/Eb4", frequency: 311.13 },
-  { note: "E4", frequency: 329.63 },
-  { note: "F4", frequency: 349.23 },
-  { note: "F#4/Gb4", frequency: 369.99 },
-  { note: "G4", frequency: 392.00 },
-  { note: "G#4/Ab4", frequency: 415.30 },
-  { note: "A4", frequency: 440.00 },
-  { note: "A#4/Bb4", frequency: 466.16 },
-  { note: "B4", frequency: 493.88 },
 ];
 
 const initialTempo = 120;
-const initialRootNote = musicalNotes[6]; // Default to G3
+const initialRootNote = musicalNotes[0]; // Default to C3
 const initialMultiplier = 1;
 
 // React functional component for the Home page
@@ -71,12 +59,12 @@ export default function Home() {
     setBeatRatio(musicalDelayTime / beatTime);
   }, [musicalDelayTime, beatTime]);
 
-    // Handler for multiplier input change
-    const handleMultiplierChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      const value = parseFloat(event.target.value);
-      if (!isNaN(value) && value >= 0.25 && value <= 4) {
-          setMultiplier(value);
-      }
+  // Handler for multiplier input change
+  const handleMultiplierChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(event.target.value);
+    if (!isNaN(value) && value >= 0.25 && value <= 4) {
+      setMultiplier(value);
+    }
   };
 
   // Handler for resetting the input fields
@@ -97,11 +85,12 @@ export default function Home() {
   const PianoKey = ({ note, frequency, isBlack, isSelected }: { note: string; frequency: number; isBlack: boolean; isSelected: boolean }) => {
     const keyClass = isBlack ? 'bg-black text-white' : 'bg-white text-black border-2 border-gray-200';
     const selectedClass = isSelected ? 'bg-accent text-accent-foreground' : 'hover:bg-accent hover:text-accent-foreground';
-  
+    const lockedClass = isSelected ? 'ring-2 ring-accent ring-inset' : ''; // Add ring only when selected
+
     return (
       <button
-        className={`relative z-10 h-20 ${keyClass} ${selectedClass} rounded-b-md focus:outline-none`}
-        style={{ width: isBlack ? '2.5rem' : '3.5rem' }}
+        className={`relative z-10 h-8 ${keyClass} ${selectedClass} ${lockedClass} focus:outline-none`}
+        style={{ width: isBlack ? '1.75rem' : '2.5rem', height: '5rem' }}
         onClick={() => setRootNote({ note, frequency })}
       >
       </button>
@@ -115,7 +104,7 @@ export default function Home() {
           Harmonic Delay Calculator
         </h1>
 
-        <section className="w-full max-w-2xl">
+        <section className="w-full max-w-md">
           {/* Input Section */}
           <Card className="mb-4">
             <CardHeader>
@@ -136,14 +125,14 @@ export default function Home() {
                     aria-label="Tempo in beats per minute"
                   />
                   <Input
-                      type="number"
-                      id="tempo-input"
-                      className="w-20"
-                      value={tempo.toString()}
-                      onChange={handleTempoChange}
-                      min={30}
-                      max={240}
-                      step={1}
+                    type="number"
+                    id="tempo-input"
+                    className="w-20"
+                    value={tempo.toString()}
+                    onChange={handleTempoChange}
+                    min={30}
+                    max={240}
+                    step={1}
                   />
                 </div>
               </div>
@@ -151,7 +140,7 @@ export default function Home() {
               {/* Root Note Selection */}
               <div className="grid gap-2">
                 <Label>Root Note</Label>
-                <div className="flex justify-center items-center py-4">
+                <div className="flex justify-center items-center py-2">
                   {/* Piano Keyboard */}
                   <div className="flex">
                     {musicalNotes.map((note) => {
@@ -185,14 +174,14 @@ export default function Home() {
                     aria-label="Multiplier for delay time"
                   />
                   <Input
-                      type="number"
-                      id="multiplier-input"
-                      className="w-20"
-                      value={multiplier.toString()}
-                      onChange={handleMultiplierChange}
-                      min={0.25}
-                      max={4}
-                      step={0.01}
+                    type="number"
+                    id="multiplier-input"
+                    className="w-20"
+                    value={multiplier.toString()}
+                    onChange={handleMultiplierChange}
+                    min={0.25}
+                    max={4}
+                    step={0.01}
                   />
                 </div>
               </div>
