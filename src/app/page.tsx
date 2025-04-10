@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // Define the type for a musical note
 interface MusicalNote {
@@ -43,10 +44,11 @@ export default function Home() {
   const [multiplier, setMultiplier] = useState<number>(initialMultiplier);
   const [semitoneOffset, setSemitoneOffset] = useState<number>(initialSemitoneOffset);
   const [frequency, setFrequency] = useState<number>(rootNote.frequency * Math.pow(2, semitoneOffset / 12));
-  const [timePerCycle, setTimePerCycle] = useState<number>(1000 / (rootNote.frequency *  Math.pow(2, semitoneOffset / 12)));
+  const [timePerCycle, setTimePerCycle] = useState<number>(1000 / (rootNote.frequency * Math.pow(2, semitoneOffset / 12)));
   const [musicalDelayTime, setMusicalDelayTime] = useState<number>(timePerCycle * multiplier);
   const [beatTime, setBeatTime] = useState<number>(60000 / tempo);
   const [beatRatio, setBeatRatio] = useState<number>(musicalDelayTime / beatTime);
+    const [selectedDivision, setSelectedDivision] = useState<string>("1/4 note");
 
   // useEffect hook to recalculate values when tempo, root note, or multiplier changes
   useEffect(() => {
@@ -70,16 +72,48 @@ export default function Home() {
     };
 
     // Function to convert beat division/multiple to a multiplier
-    const beatDivisionToMultiplier = (beatDivision: number): number => {
-      return 1 / beatDivision;
+    const beatDivisionToMultiplier = (beatDivision: string): number => {
+      switch (beatDivision) {
+        case "Dotted 1/2 note":
+          return 0.75;
+        case "1/2 note":
+          return 0.5;
+        case "1/2 note triplets":
+          return 1/3;
+        case "Dotted 1/4 note":
+          return 0.375;
+        case "1/4 note":
+          return 0.25;
+        case "1/4 note triplets":
+          return 1/6;
+        case "Dotted 1/8 note":
+          return 0.1875;
+        case "1/8 note":
+          return 0.125;
+        case "1/8 note triplets":
+          return 1/12;
+        case "Dotted 1/16 note":
+          return 0.09375;
+        case "1/16 note":
+          return 0.0625;
+        case "1/16 note triplets":
+          return 1/24;
+        case "Dotted 1/32 note":
+          return 0.046875;
+        case "1/32 note":
+          return 0.03125;
+        case "1/32 note triplets":
+          return 1/48;
+        case "Dotted 1/64 note":
+          return 0.0234375;
+        case "1/64 note":
+          return 0.015625;
+        case "1/64 note triplets":
+          return 1/96;
+        default:
+          return 0.25; // Default to 1/4 note
+      }
     };
-
-    const handleMultiplierChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = parseFloat(event.target.value);
-        if (!isNaN(value) && value >= 1 && value <= 16) {
-          setMultiplier(beatDivisionToMultiplier(value));
-        }
-      };
 
   // Handler for resetting the input fields
   const handleReset = () => {
@@ -186,7 +220,7 @@ export default function Home() {
                     id="semitoneOffset"
                     min={-24}
                     max={24}
-                    step={1}
+                    step={12}
                     defaultValue={[semitoneOffset]}
                     onValueChange={(value) => setSemitoneOffset(value[0])}
                     aria-label="Semitone Offset"
@@ -199,7 +233,7 @@ export default function Home() {
                     onChange={handleSemitoneOffsetChange}
                     min={-24}
                     max={24}
-                    step={1}
+                    step={12}
                   />
                 </div>
               </div>
@@ -207,27 +241,34 @@ export default function Home() {
               {/* Multiplier Input */}
               <div className="grid gap-2">
                 <Label htmlFor="multiplier">Beat Division</Label>
-                <div className="flex items-center space-x-2">
-                  <Slider
-                    id="multiplier"
-                    min={1}
-                    max={16}
-                    step={1}
-                    defaultValue={[1 / multiplier]}
-                    onValueChange={(value) => setMultiplier(beatDivisionToMultiplier(value[0]))}
-                    aria-label="Multiplier for delay time"
-                  />
-                  <Input
-                    type="number"
-                    id="multiplier-input"
-                    className="w-20"
-                    value={(1/multiplier).toString()}
-                    onChange={handleMultiplierChange}
-                    min={1}
-                    max={16}
-                    step={1}
-                  />
-                </div>
+                  <Select onValueChange={(value) => {
+                    setSelectedDivision(value);
+                    setMultiplier(beatDivisionToMultiplier(value));
+                  }}>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select a beat division" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Dotted 1/2 note">Dotted 1/2 note</SelectItem>
+                      <SelectItem value="1/2 note">1/2 note</SelectItem>
+                      <SelectItem value="1/2 note triplets">1/2 note triplets</SelectItem>
+                      <SelectItem value="Dotted 1/4 note">Dotted 1/4 note</SelectItem>
+                      <SelectItem value="1/4 note">1/4 note</SelectItem>
+                      <SelectItem value="1/4 note triplets">1/4 note triplets</SelectItem>
+                      <SelectItem value="Dotted 1/8 note">Dotted 1/8 note</SelectItem>
+                      <SelectItem value="1/8 note">1/8 note</SelectItem>
+                      <SelectItem value="1/8 note triplets">1/8 note triplets</SelectItem>
+                      <SelectItem value="Dotted 1/16 note">Dotted 1/16 note</SelectItem>
+                      <SelectItem value="1/16 note">1/16 note</SelectItem>
+                      <SelectItem value="1/16 note triplets">1/16 note triplets</SelectItem>
+                      <SelectItem value="Dotted 1/32 note">Dotted 1/32 note</SelectItem>
+                      <SelectItem value="1/32 note">1/32 note</SelectItem>
+                      <SelectItem value="1/32 note triplets">1/32 note triplets</SelectItem>
+                      <SelectItem value="Dotted 1/64 note">Dotted 1/64 note</SelectItem>
+                      <SelectItem value="1/64 note">1/64 note</SelectItem>
+                      <SelectItem value="1/64 note triplets">1/64 note triplets</SelectItem>
+                    </SelectContent>
+                  </Select>
               </div>
               <Button type="button" onClick={handleReset}>
                 Reset
