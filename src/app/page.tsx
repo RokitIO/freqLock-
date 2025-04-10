@@ -33,6 +33,7 @@ const musicalNotes: MusicalNote[] = [
 const initialTempo = 120;
 const initialRootNote = musicalNotes[0]; // Default to C3
 const initialMultiplier = 1;
+const initialOctaveMultiplier = 1;
 
 // React functional component for the Home page
 export default function Home() {
@@ -40,19 +41,20 @@ export default function Home() {
   const [tempo, setTempo] = useState<number>(initialTempo);
   const [rootNote, setRootNote] = useState<MusicalNote>(initialRootNote);
   const [multiplier, setMultiplier] = useState<number>(initialMultiplier);
-  const [frequency, setFrequency] = useState<number>(rootNote.frequency);
-  const [timePerCycle, setTimePerCycle] = useState<number>(1000 / rootNote.frequency);
+  const [octaveMultiplier, setOctaveMultiplier] = useState<number>(initialOctaveMultiplier);
+  const [frequency, setFrequency] = useState<number>(rootNote.frequency * octaveMultiplier);
+  const [timePerCycle, setTimePerCycle] = useState<number>(1000 / (rootNote.frequency * octaveMultiplier));
   const [musicalDelayTime, setMusicalDelayTime] = useState<number>(timePerCycle * multiplier);
   const [beatTime, setBeatTime] = useState<number>(60000 / tempo);
   const [beatRatio, setBeatRatio] = useState<number>(musicalDelayTime / beatTime);
 
   // useEffect hook to recalculate values when tempo, root note, or multiplier changes
   useEffect(() => {
-    setFrequency(rootNote.frequency);
-    setTimePerCycle(1000 / rootNote.frequency);
-    setMusicalDelayTime((1000 / rootNote.frequency) * multiplier);
+    setFrequency(rootNote.frequency * octaveMultiplier);
+    setTimePerCycle(1000 / (rootNote.frequency * octaveMultiplier));
+    setMusicalDelayTime((1000 / (rootNote.frequency * octaveMultiplier)) * multiplier);
     setBeatTime(60000 / tempo);
-  }, [tempo, rootNote, multiplier]);
+  }, [tempo, rootNote, multiplier, octaveMultiplier]);
 
   // useEffect hook to recalculate beat ratio when musicalDelayTime or beatTime changes
   useEffect(() => {
@@ -67,11 +69,20 @@ export default function Home() {
     }
   };
 
+    // Handler for octave multiplier input change
+    const handleOctaveMultiplierChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const value = parseFloat(event.target.value);
+      if (!isNaN(value) && value >= 0.25 && value <= 4) {
+        setOctaveMultiplier(value);
+      }
+    };
+
   // Handler for resetting the input fields
   const handleReset = () => {
     setTempo(initialTempo);
     setRootNote(initialRootNote);
     setMultiplier(initialMultiplier);
+      setOctaveMultiplier(initialOctaveMultiplier);
   };
 
   const handleTempoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -160,6 +171,32 @@ export default function Home() {
                       );
                     })}
                   </div>
+                </div>
+              </div>
+
+               {/* Octave Multiplier Input */}
+               <div className="grid gap-2">
+                <Label htmlFor="octaveMultiplier">Octave Multiplier</Label>
+                <div className="flex items-center space-x-2">
+                  <Slider
+                    id="octaveMultiplier"
+                    min={0.25}
+                    max={4}
+                    step={0.05}
+                    defaultValue={[octaveMultiplier]}
+                    onValueChange={(value) => setOctaveMultiplier(value[0])}
+                    aria-label="Octave Multiplier"
+                  />
+                  <Input
+                    type="number"
+                    id="octaveMultiplier-input"
+                    className="w-20"
+                    value={octaveMultiplier.toString()}
+                    onChange={handleOctaveMultiplierChange}
+                    min={0.25}
+                    max={4}
+                    step={0.01}
+                  />
                 </div>
               </div>
 
