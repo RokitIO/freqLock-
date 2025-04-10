@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 
 // Define the type for a musical note
 interface MusicalNote {
@@ -33,7 +35,7 @@ const musicalNotes: MusicalNote[] = [
 
 const initialTempo = 120;
 const initialRootNote = musicalNotes[0]; // Default to C3
-const initialMultiplier = 0.25;
+const initialMultiplier = 1;
 const initialSemitoneOffset = 0;
 const initialBeatDivisionIndex = 11; // Index of "1/4 note"
 
@@ -65,6 +67,18 @@ const beatDivisions = [
     "1/64 note triplets"
 ];
 
+const multipliers = [
+    { label: '1/4x (2 octaves below)', value: 0.25 },
+    { label: '1/2x (subharmonic)', value: 0.5 },
+    { label: '1x (fundamental)', value: 1 },
+    { label: '2x (harmonic)', value: 2 },
+    { label: '4x (rich tail)', value: 4 },
+    { label: '8x', value: 8 },
+    { label: '16x', value: 16 },
+    { label: '32x', value: 32 },
+    { label: '64x', value: 64 },
+];
+
 // React functional component for the Home page
 export default function Home() {
   // State variables using the useState hook
@@ -79,6 +93,8 @@ export default function Home() {
   const [beatRatio, setBeatRatio] = useState<number>(musicalDelayTime / beatTime);
   const [beatDivisionIndex, setBeatDivisionIndex] = useState<number>(initialBeatDivisionIndex);
   const [closestNoteDivision, setClosestNoteDivision] = useState<string>(getClosestNoteDivision(beatRatio));
+  const [useHarmonicMultiples, setUseHarmonicMultiples] = useState<boolean>(false);
+  const [selectedMultiplier, setSelectedMultiplier] = useState<number>(multipliers[2].value); // Default to 1x
 
   // useEffect hook to recalculate values when tempo, root note, or multiplier changes
   useEffect(() => {
@@ -89,8 +105,8 @@ export default function Home() {
   }, [tempo, rootNote, semitoneOffset]);
 
   useEffect(() => {
-    setMusicalDelayTime(timePerCycle * multiplier);
-  }, [timePerCycle, multiplier]);
+      setMusicalDelayTime(timePerCycle * (useHarmonicMultiples ? selectedMultiplier : multiplier));
+  }, [timePerCycle, multiplier, selectedMultiplier, useHarmonicMultiples]);
 
   // useEffect hook to recalculate beat ratio when musicalDelayTime or beatTime changes
   useEffect(() => {
@@ -317,26 +333,47 @@ export default function Home() {
 
               {/* Multiplier Input */}
               <div className="grid gap-2">
-                <Label htmlFor="multiplier">Beat Division</Label>
-                <Slider
-                  id="multiplier"
-                  min={0}
-                  max={beatDivisions.length - 1}
-                  step={1}
-                  defaultValue={[initialBeatDivisionIndex]}
-                    value={[beatDivisionIndex]}
-                  onValueChange={(value) => {
-                    if (value && value.length > 0) {
-                      handleMultiplierChange(value);
-                    }
-                  }}
-                  aria-label="Beat Division"
-                />
+                <Label htmlFor="multiplier">
+                    {useHarmonicMultiples ? "Harmonic Multiplier" : "Beat Division"}
+                </Label>
+                <Switch id="useHarmonicMultiples" onCheckedChange={setUseHarmonicMultiples} />
+                <Label htmlFor="useHarmonicMultiples">Use Harmonic Multiples</Label>
+                {useHarmonicMultiples ? (
+                    <Select onValueChange={(value) => setSelectedMultiplier(parseFloat(value))}>
+                        <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select a multiplier" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {multipliers.map((multiplier) => (
+                                <SelectItem key={multiplier.value} value={multiplier.value.toString()}>
+                                    {multiplier.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                ) : (
+                    <Slider
+                      id="multiplier"
+                      min={0}
+                      max={beatDivisions.length - 1}
+                      step={1}
+                      defaultValue={[initialBeatDivisionIndex]}
+                        value={[beatDivisionIndex]}
+                        onValueChange={(value) => {
+                          if (value && value.length > 0) {
+                            const index = Math.round(value[0]);
+                            setBeatDivisionIndex(index);
+                            setMultiplier(beatDivisionToMultiplier(beatDivisions[index]));
+                          }
+                        }}
+                      aria-label="Beat Division"
+                    />
+                )}
                 <Input
                   type="text"
                   id="multiplier-input"
                   className="w-full"
-                  value={beatDivisions[beatDivisionIndex] || "1/4 note"}
+                  value={useHarmonicMultiples ? selectedMultiplier.toString() : beatDivisions[beatDivisionIndex] || "1/4 note"}
                   readOnly
                 />
               </div>
@@ -380,5 +417,21 @@ export default function Home() {
       </main>
     </div>
   );
-}
 
+    // Function to get the closest musical note division
+    function getClosestNoteDivision(ratio: number): string {
+        const divisions = [
+            { label: "1/1", value: 1 },
+            { label: "1/2", value: 0.5 },
+            { label: "1/4", value: 0.25 },
+            { label: "1/8", value: 0.125 },
+            { label: "1/16", value: 0.0625 },
+            { label: "1/32", value: 0.03125 },
+            { label: "1/64", value: 0.015625 },
+        ];
+        let closest = divisions.reduce((prev, curr) =>
+            Math.abs(curr.value - ratio) < Math.abs(prev.value - ratio) ? curr : prev
+        );
+        return closest.label;
+    }
+}
