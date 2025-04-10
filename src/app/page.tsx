@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Define the type for a musical note
@@ -40,16 +41,10 @@ const musicalNotes: MusicalNote[] = [
   { note: "B4", frequency: 493.88 },
 ];
 
-// Multiplier options for cycle time
-const multiplierOptions = [
-  { label: "0.25x", value: 0.25 },
-  { label: "0.5x", value: 0.5 },
-  { label: "1x", value: 1 },
-  { label: "2x", value: 2 },
-  { label: "4x", value: 4 },
-];
-
 export default function Home() {
+  // Ref for the tempo input element
+  const tempoInputRef = useRef<HTMLInputElement>(null);
+
   // State variables for tempo, root note, multiplier, and calculated values
   const [tempo, setTempo] = useState<number | undefined>(120);
   const [rootNote, setRootNote] = useState<MusicalNote>(musicalNotes[6]); // Default to G3
@@ -63,7 +58,7 @@ export default function Home() {
   // useEffect hook to recalculate values when tempo, root note, or multiplier changes
   useEffect(() => {
     // Ensure tempo is a valid number
-    const validTempo = tempo !== undefined ? tempo : 120;
+    const validTempo = tempo !== undefined && tempo >= 1 ? tempo : 120;
     setFrequency(rootNote.frequency);
     setTimePerCycle(1000 / rootNote.frequency);
     setMusicalDelayTime((1000 / rootNote.frequency) * multiplier);
@@ -78,10 +73,22 @@ export default function Home() {
   // Handler for tempo input change
   const handleTempoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(event.target.value);
-    if (!isNaN(value)) {
+    if (!isNaN(value) && value >= 1) {
       setTempo(value);
     } else {
       setTempo(undefined);
+    }
+  };
+
+  // Handler for resetting the input fields
+  const handleReset = () => {
+    setTempo(120);
+    setRootNote(musicalNotes[6]);
+    setMultiplier(1);
+
+    // Programmatically set the tempo input value to 120
+    if (tempoInputRef.current) {
+      tempoInputRef.current.value = '120';
     }
   };
 
@@ -107,43 +114,49 @@ export default function Home() {
                   placeholder="Enter BPM"
                   value={tempo !== undefined ? tempo.toString() : ''}
                   onChange={handleTempoChange}
+                  ref={tempoInputRef}
+                  aria-label="Tempo in beats per minute"
                 />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="rootNote">Root Note</Label>
-                <Select onValueChange={(value) => {
-                  const selectedNote = musicalNotes.find(note => note.note === value);
-                  if (selectedNote) {
-                    setRootNote(selectedNote);
-                  }
-                }}>
-                  <SelectTrigger id="rootNote">
-                    <SelectValue placeholder={rootNote.note} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {musicalNotes.map((note) => (
-                      <SelectItem key={note.note} value={note.note}>
-                        {note.note} ({note.frequency.toFixed(2)} Hz)
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <select
+                  id="rootNote"
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  value={rootNote.note}
+                  onChange={(e) => {
+                    const selectedNote = musicalNotes.find(note => note.note === e.target.value);
+                    if (selectedNote) {
+                      setRootNote(selectedNote);
+                    }
+                  }}
+                  aria-label="Root Note"
+                >
+                  {musicalNotes.map((note) => (
+                    <option key={note.note} value={note.note}>
+                      {note.note} ({note.frequency.toFixed(2)} Hz)
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="multiplier">Multiplier</Label>
-                <Select onValueChange={(value) => setMultiplier(parseFloat(value))}>
-                  <SelectTrigger id="multiplier">
-                    <SelectValue placeholder={`${multiplier}x`} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {multiplierOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value.toString()}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Slider
+                  id="multiplier"
+                  min={0.25}
+                  max={4}
+                  step={0.25}
+                  defaultValue={[multiplier]}
+                  onValueChange={(value) => setMultiplier(value[0])}
+                  aria-label="Multiplier for delay time"
+                />
+                <div className="text-sm text-muted-foreground">
+                  {multiplier}x
+                </div>
               </div>
+              <Button type="button" onClick={handleReset}>
+                Reset
+              </Button>
             </CardContent>
           </Card>
 
