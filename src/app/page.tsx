@@ -1,5 +1,5 @@
 "use client";
-
+import type { Mode } from "@/lib/scale";
 import { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,19 +16,31 @@ import { cn } from "@/lib/utils";
 
 interface MusicalNote { note: string; midiNote: number; frequency: number; }
 
-const musicalNotes: MusicalNote[] = [
+const musicalNotes: MusicalNote[] = [ //added sharps to this as well
     { note: "C3", midiNote: 48, frequency: 130.81 },
-    { note: "C#3/Db3", midiNote: 49, frequency: 138.59 },
+    { note: "C#3", midiNote: 49, frequency: 138.59 },
     { note: "D3", midiNote: 50, frequency: 146.83 },
-    { note: "D#3/Eb3", midiNote: 51, frequency: 155.56 },
+    { note: "D#3", midiNote: 51, frequency: 155.56 },
     { note: "E3", midiNote: 52, frequency: 164.81 },
     { note: "F3", midiNote: 53, frequency: 174.61 },
-    { note: "F#3/Gb3", midiNote: 54, frequency: 185.00 },
+    { note: "F#3", midiNote: 54, frequency: 185.00 },
     { note: "G3", midiNote: 55, frequency: 196.00 },
-    { note: "G#3/Ab3", midiNote: 56, frequency: 207.65 },
+    { note: "G#3", midiNote: 56, frequency: 207.65 },
     { note: "A3", midiNote: 57, frequency: 220.00 },
-    { note: "A#3/Bb3", midiNote: 58, frequency: 233.08 },
+    { note: "A#3", midiNote: 58, frequency: 233.08 },
     { note: "B3", midiNote: 59, frequency: 246.94 },
+    { note: "C4", midiNote: 60, frequency: 261.63 },
+    { note: "C#4", midiNote: 61, frequency: 277.18 },
+    { note: "D4", midiNote: 62, frequency: 293.66 },
+    { note: "D#4", midiNote: 63, frequency: 311.13 },
+    { note: "E4", midiNote: 64, frequency: 329.63 },
+    { note: "F4", midiNote: 65, frequency: 349.23 },
+    { note: "F#4", midiNote: 66, frequency: 369.99 },
+    { note: "G4", midiNote: 67, frequency: 392.00 },
+    { note: "G#4", midiNote: 68, frequency: 415.30 },
+    { note: "A4", midiNote: 69, frequency: 440.00 },
+    { note: "A#4", midiNote: 70, frequency: 466.16 },
+    { note: "B4", midiNote: 71, frequency: 493.88 },
     { note: "C4", midiNote: 60, frequency: 261.63 },
 ];
 
@@ -163,7 +175,7 @@ export default function Home() {
 
     const [scaleNotes, setScaleNotes] = useState<string[]>(['C', 'D', 'E', 'F', 'G', 'A', 'B']);
     const [chordNotes, setChordNotes] = useState<string[]>(['C', 'E', 'G']);
-    const [scaleType, setScaleType] = useState<string>("major");
+    const [scaleType, setScaleType] = useState<Mode>("Major");
     const [chordType, setChordType] = useState<string>("major");
 
     // Recalculate values whenever inputs change
@@ -189,8 +201,7 @@ export default function Home() {
         setChakraEnergy(seal ? seal.energy : "Unknown");
         //setChakraColor(seal ? seal.color : "grey");
 
-        setScaleNotes(generateScale(rootNote.note[0], scaleType));
-        setChordNotes(generateChord(rootNote.note[0], chordType));
+        setChordNotes(generateChord(rootNote.note.replace(/[0-9]/g, ''), chordType));
     }, [tempo, rootNote, multiplier, semitoneOffset, selectedMultiplier, useHarmonicMultiples, beatDivisionIndex, scaleType, chordType]);
 
     // Handlers
@@ -225,6 +236,7 @@ export default function Home() {
             setMultiplier(beatDivisionToMultiplier(beatDivisions[index]));
         }
     };
+
 
     const PianoKey = ({ note, midiNote, frequency, isBlack, isSelected }: { note: string; midiNote: number; frequency: number; isBlack: boolean; isSelected: boolean }) => {
         const keyWidth = isBlack ? '1.5rem' : '2rem';
@@ -261,21 +273,24 @@ export default function Home() {
         return closest.label;
     }
 
-    // Sample scale
-    //const [scaleNotes, setScaleNotes] = useState(['C', 'D', 'E', 'F', 'G', 'A', 'B']);
-    //const [chordNotes, setChordNotes] = useState(['C', 'E', 'G']);
-
-    const handleScaleTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setScaleType(event.target.value);
-    };
+    // Use Effect to set the scale notes.
+     useEffect(() => {
+        const root = rootNote.note.replace(/[0-9]/g, '');
+        setScaleNotes(generateScale(root, scaleType)); 
+    }, [rootNote, scaleType]);
 
     const handleChordTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setChordType(event.target.value);
     };
 
+
     // Function to sort notes by frequency
-    const sortNotesByFrequency = (notes: string[]): string[] => {
-        return [...notes].sort((a, b) => (noteFrequencies[a] || 0) - (noteFrequencies[b] || 0));
+    const sortNotesByFrequency = (notesArr: string[]): string[] => {
+       
+        
+        return [...notesArr].sort((a, b) => {
+            return getNoteIndex(a) - getNoteIndex(b);
+        });
     };
 
     const getSealPointInfo = (note: string) => {
@@ -321,7 +336,7 @@ export default function Home() {
                                         className="w-20"
                                         value={tempo.toString()}
                                         onChange={handleTempoChange}
-                                        min={30}
+                                        min={30}                                                                       max={240}
                                         max={240}
                                         step={1}
                                     />
@@ -484,16 +499,16 @@ export default function Home() {
                                     <SelectContent>
                                         <SelectItem value="major">Major</SelectItem>
                                         <SelectItem value="minor">Minor</SelectItem>
-                                        <SelectItem value="dorian">Dorian</SelectItem>
-                                        <SelectItem value="lydian">Lydian</SelectItem>
-                                        <SelectItem value="phrygian">Phrygian</SelectItem>
+                                        <SelectItem value="Dorian">Dorian</SelectItem>
+                                        <SelectItem value="Lydian">Lydian</SelectItem>
+                                        <SelectItem value="Phrygian">Phrygian</SelectItem>
                                     </SelectContent>
-                                </Select>
+                                </Select> 
                             </div>
-                            <div className="grid gap-2">
+                           <div className="grid gap-2">
                                 <Label>Scale Notes:</Label>
                                 <div>{sortNotesByFrequency(scaleNotes).map(note => `${note} (${noteFrequencies[note] || "N/A"} Hz)`).join(' - ')}</div>
-                            </div>
+                                </div>
                         </CardContent>
                     </Card>
 
@@ -535,59 +550,53 @@ export default function Home() {
 }
 
 const notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-
-const noteFrequencies = {
-    "C": 261.63, "C#": 277.18, "D": 293.66, "D#": 311.13,
-    "E": 329.63, "F": 349.23, "F#": 369.99, "G": 392.00,
-    "G#": 415.30, "A": 440.00, "A#": 466.16, "B": 493.88
+// updated frequencies and added flats
+const noteFrequencies: { [key: string]: number } = {
+    "C": 261.63, "C#": 277.18, "Db": 277.18, // C#/Db
+    "D": 293.66, "D#": 311.13, "Eb": 311.13, // D#/Eb
+    "E": 329.63, "F": 349.23, "F#": 369.99,  // F#/Gb
+    "Gb": 369.99, "G": 392.00, "G#": 415.30, // G#/Ab
+    "Ab": 415.30, "A": 440.00, "A#": 466.16, // A#/Bb
+    "Bb": 466.16, "B": 493.88               
 };
 
-function getNoteIndex(note: string) {
-    return notes.indexOf(note);
+function getNoteIndex(note: string):number {
+        const sanitizedNote = note.replace(/b/g, "#");
+    
+        let index = notes.indexOf(sanitizedNote);
+        
+        return index;
 }
+
+
 
 function transposeNote(root: string, interval: number) {
     const rootIndex = getNoteIndex(root);
     return notes[(rootIndex + interval) % 12];
 }
 
-const scalePatterns = {
-    major: [0, 2, 4, 5, 7, 9, 11],
-    minor: [0, 2, 3, 5, 7, 8, 10],
-    dorian: [0, 2, 3, 5, 7, 9, 10],
-    lydian: [0, 2, 4, 6, 7, 9, 11],
-    phrygian: [0, 1, 3, 5, 7, 8, 10]
-};
-
-function generateScale(root: string, type: string = "major") {
-    const pattern = scalePatterns[type as keyof typeof scalePatterns];
-    const scale = pattern.map(interval => transposeNote(root, interval));
-    return scale;
-}
-
 const chordPatterns = {
-    major: [0, 4, 7],
-    minor: [0, 3, 7],
-    dim: [0, 3, 6],
-    aug: [0, 4, 8],
-    maj7: [0, 4, 7, 11],
-    min7: [0, 3, 7, 10],
-    dom7: [0, 4, 7, 10],
-    sus2: [0, 2, 7],
-    sus4: [0, 5, 7]
-};
+    major: [0, 4, 7],minor: [0, 3, 7],dim: [0, 3, 6],aug: [0, 4, 8],maj7: [0, 4, 7, 11],min7: [0, 3, 7, 10],dom7: [0, 4, 7, 10],sus2: [0, 2, 7],sus4: [0, 5, 7]};
 
-function generateChord(root: string, type: string = "major") {
-    const pattern = chordPatterns[type as keyof typeof chordPatterns];
-    const chord = pattern.map(interval => transposeNote(root, interval));
-    return chord;
-}
+    function generateChord(root: string, type: string = "major") {
+        const pattern = chordPatterns[type as keyof typeof chordPatterns];
+        if (!pattern) return [];
+    
+        const rootIndex = getNoteIndex(root);
+        if (rootIndex === -1) return [];
+    
+        const chordNotes = pattern.map(interval => {
+            const transposedIndex = (rootIndex + interval) % 12;
+            return notes[transposedIndex];
+        });    
+        return chordNotes;
+    }
 
 function getFrequencies(notesArr: string[]) {
     return notesArr.map(note => ({
-        note,
+        note: note,
         freq: noteFrequencies[note] || "N/A"
-    }));
+    }));    
 }
 
 const metaphysicalMap = {
@@ -601,7 +610,8 @@ const metaphysicalMap = {
 };
 
 function getMetaphysicalInfo(note: string) {
-    const root = note[0]; // handle "C#", "D#", etc.
+    const root = note.replace(/[0-9#b]/g, ''); //remove numbers, sharps and flats
+
     return metaphysicalMap[root] || {
         chakra: "—",
         mood: "—",
@@ -610,6 +620,45 @@ function getMetaphysicalInfo(note: string) {
     };
 }
 
+
+const majorScalePattern = [0, 2, 4, 5, 7, 9, 11];
+const minorScalePattern = [0, 2, 3, 5, 7, 8, 10];
+const dorianScalePattern = [0, 2, 3, 5, 7, 9, 10];
+const lydianScalePattern = [0, 2, 4, 6, 7, 9, 11];
+const phrygianScalePattern = [0, 1, 3, 5, 7, 8, 10];
+
+
+export function generateScale(root: string, mode: Mode) {
+    let pattern;
+
+    switch (mode) {
+        case "major":
+            pattern = majorScalePattern;
+            break;
+        case "minor":
+            pattern = minorScalePattern;
+            break;
+        case "Dorian":
+            pattern = dorianScalePattern;
+            break;
+        case "Lydian":
+            pattern = lydianScalePattern;
+            break;
+        case "Phrygian":
+            pattern = phrygianScalePattern;
+            break;
+        default:
+            pattern = majorScalePattern;
+            break;
+    }
+
+    const rootIndex = getNoteIndex(root);
+    if (rootIndex === -1) return []; // Handle invalid root notes
+
+    return pattern.map(interval => transposeNote(root, interval));
+}
+
+export type Mode = "major" | "minor" | "Dorian" | "Lydian" | "Phrygian";
 
 
 
