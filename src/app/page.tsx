@@ -14,7 +14,8 @@ import { cn } from "@/lib/utils";
 // 1. CONFIGS & DATASETS
 // ----------------------
 
-const chakraModes = {
+// Chakra tones mapped to keys (7-tone system)
+const chakraMap = {
     "C": { chakra: "Root", color: "Red", westernFreq: 130.81, solfeggioFreq: 396, energy: "Grounding | Stability | Presence" },
     "D": { chakra: "Sacral", color: "Orange", westernFreq: 146.83, solfeggioFreq: 417, energy: "Creativity | Sensuality | Pleasure" },
     "E": { chakra: "Solar Plexus", color: "Yellow", westernFreq: 164.81, solfeggioFreq: 528, energy: "Willpower | Confidence | Energy" },
@@ -23,6 +24,12 @@ const chakraModes = {
     "A": { chakra: "Third Eye", color: "Indigo", westernFreq: 220.00, solfeggioFreq: 852, energy: "Intuition | Insight | Wisdom" },
     "B": { chakra: "Crown", color: "Violet", westernFreq: 246.94, solfeggioFreq: 963, energy: "Spirituality | Enlightenment | Connection" }
 };
+
+// Master numbers (numerology)
+const masterNumbers = [11, 22, 33, 44, 55, 66, 77, 88, 99, 111];
+
+// Common angel number intervals in Hz
+const angelIntervals = [111, 222, 333, 444, 555, 666, 777, 888, 999];
 
 interface MusicalNote { note: string; midiNote: number; frequency: number; }
 
@@ -216,6 +223,10 @@ export default function Home() {
         return closest.label;
     }
 
+    // Sample scale
+    const [scaleNotes, setScaleNotes] = useState(['C', 'D', 'E', 'F', 'G', 'A', 'B']);
+    const [chordNotes, setChordNotes] = useState(['C', 'E', 'G']);
+
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
             <main className="flex flex-col items-center justify-center w-full flex-1 px-4 sm:px-20 text-center">
@@ -399,6 +410,32 @@ export default function Home() {
                             <div className="grid gap-2">
                                 <Label>Chakra Energy:</Label>
                                 <div className="text-lg font-semibold text-lime-500">{chakraEnergy}</div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Scales Section */}
+                    <Card className="mb-4">
+                        <CardHeader>
+                            <CardTitle>Scale Generator</CardTitle>
+                        </CardHeader>
+                        <CardContent className="grid gap-4">
+                            <div className="grid gap-2">
+                                <Label>Scale Notes:</Label>
+                                <div>{scaleNotes.join(' - ')}</div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Chords Section */}
+                    <Card className="mb-4">
+                        <CardHeader>
+                            <CardTitle>Chord Library</CardTitle>
+                        </CardHeader>
+                        <CardContent className="grid gap-4">
+                            <div className="grid gap-2">
+                                <Label>Chord Notes:</Label>
+                                <div>{chordNotes.join(' - ')}</div>
                             </div>
                         </CardContent>
                     </Card>
