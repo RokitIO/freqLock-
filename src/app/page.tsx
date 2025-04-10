@@ -305,11 +305,11 @@ export default function Home() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
-            <main className="flex flex-col items-center justify-center w-full flex-1 px-4 sm:px-20 text-center">
+            <main className="flex flex-col items-center justify-center flex-1 px-4 sm:px-20 text-center gap-8">
                 <h1 className="text-2xl md:text-4xl font-bold text-teal-800 mb-4">
                 💎 FreqLock™
-                <p className="text-base md:text-lg font-semibold text-gray-700">🔊🎚️ Harmonic Delay Calculator for Tuned Echo Perfection</p>
-                </h1>            
+                </h1>
+                 <h2 className="text-lg md:text-2xl font-bold text-teal-800 mb-4">🔊🎚️ Harmonic Delay Calculator for Tuned Echo Perfection</h2>
 
                 <section className="w-full max-w-md">
                     {/* Input Section */}
@@ -347,10 +347,10 @@ export default function Home() {
                             {/* Root Note Selection */}
                             <div className="grid gap-2">
                                 <Label>Root Note</Label>
-                                <div className="flex justify-center items-center py-2">
+                                <div className="flex justify-center items-center py-2 max-w-md">
                                     {/* Piano Keyboard */}
-                                    <div className="flex max-w-md">
-                                        {musicalNotes.map((note) => {
+                                    <div className="flex">
+                                    {musicalNotes.map((note) => {
                                             const isBlackKey = note.note.includes("#") || note.note.includes("b");
                                             const isSelected = rootNote.note === note.note;
                                             return (
@@ -398,7 +398,7 @@ export default function Home() {
                             <div className="grid gap-2">
                                 <Label htmlFor="multiplier">
                                     {!useHarmonicMultiples ? "Beat Division" : "Harmonic Multiplier"}
-                                </Label>
+                                </Label>                              
                                 <Switch id="useHarmonicMultiples" onCheckedChange={setUseHarmonicMultiples} />
                                 <Label htmlFor="useHarmonicMultiples">Use Harmonic Multiples</Label>
                                 {useHarmonicMultiples ? (
@@ -440,7 +440,7 @@ export default function Home() {
                         </CardContent>
                     </Card>
 
-                    {/* Output Section */}
+                    {/* Output Section */}                  
                     <Card>
                         <CardHeader>
                             <CardTitle>Calculated Results</CardTitle>
@@ -486,7 +486,7 @@ export default function Home() {
                     </Card>
 
                     {/* Scales Section */}
-                    <Card className="mb-4">
+                    <Card className="mb-4 max-w-md">
                         <CardHeader>
                             <CardTitle>Scale Generator</CardTitle>
                         </CardHeader>
@@ -509,12 +509,12 @@ export default function Home() {
                            <div className="grid gap-2">
                                 <Label>Scale Notes:</Label>
                                 <div>{sortNotesByFrequency(scaleNotes).map((note, index) => <span key={note + index}>{`${note} (${noteFrequencies[note] || "N/A"} Hz)`} </span>).reduce((prev, curr) => [prev, ', ', curr])}</div>
-                                </div>
+                            </div>
                         </CardContent>
                     </Card>
 
-                    {/* Chords Section */}
-                    <Card className="mb-4">
+                    {/* Chords Section */}                    
+                    <Card>
                         <CardHeader>
                             <CardTitle>Chord Library</CardTitle>
                         </CardHeader>
