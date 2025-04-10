@@ -9,6 +9,27 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 
+// ----------------------
+// 1. CONFIGS & DATASETS
+// ----------------------
+
+// Chakra tones mapped to keys (7-tone system)
+const chakraMap = {
+    "C": "Root",
+    "D": "Sacral",
+    "E": "Solar Plexus",
+    "F": "Heart",
+    "G": "Throat",
+    "A": "Third Eye",
+    "B": "Crown"
+};
+
+// Master numbers (numerology)
+const masterNumbers = [11, 22, 33, 44, 55, 66, 77, 88, 99, 111];
+
+// Common angel number intervals in Hz
+const angelIntervals = [111, 222, 333, 444, 555, 666, 777, 888, 999];
+
 // Define the type for a musical note
 interface MusicalNote {
   note: string;
@@ -79,6 +100,33 @@ const multipliers = [
     { label: '64x', value: 64 },
 ];
 
+// ----------------------
+// 2. UTILITY FUNCTIONS
+// ----------------------
+
+// MIDI note to frequency converter
+function midiToFreq(midiNote: number): number {
+  return 440 * Math.pow(2, (midiNote - 69) / 12);
+}
+
+// Round to nearest master number
+function closestMasterNumber(bpm: number): number {
+  return masterNumbers.reduce((closest, num) =>
+    Math.abs(num - bpm) < Math.abs(closest - bpm) ? num : closest
+  );
+}
+
+// Find angel number match from harmonic frequencies
+function matchAngelInterval(freq: number): number | null {
+  return angelIntervals.find((a) => Math.abs(freq - a) < 1) || null;
+}
+
+// Find chakra tone from root note
+function matchChakra(rootNote: string): string {
+  const tone = rootNote[0]; // First letter of note
+  return chakraMap[tone] || "Unknown Chakra";
+}
+
 // React functional component for the Home page
 export default function Home() {
   // State variables using the useState hook
@@ -86,30 +134,53 @@ export default function Home() {
   const [rootNote, setRootNote] = useState<MusicalNote>(initialRootNote);
   const [multiplier, setMultiplier] = useState<number>(initialMultiplier);
   const [semitoneOffset, setSemitoneOffset] = useState<number>(initialSemitoneOffset);
-  const [frequency, setFrequency] = useState<number>(rootNote.frequency * Math.pow(2, semitoneOffset / 12));
-  const [timePerCycle, setTimePerCycle] = useState<number>(1000 / (rootNote.frequency * Math.pow(2, semitoneOffset / 12)));
-  const [musicalDelayTime, setMusicalDelayTime] = useState<number>(timePerCycle * multiplier);
-  const [beatTime, setBeatTime] = useState<number>(60000 / tempo);
-  const [beatRatio, setBeatRatio] = useState<number>(musicalDelayTime / beatTime);
-  const [beatDivisionIndex, setBeatDivisionIndex] = useState<number>(initialBeatDivisionIndex);
-  const [closestNoteDivision, setClosestNoteDivision] = useState<string>(getClosestNoteDivision(beatRatio));
   const [useHarmonicMultiples, setUseHarmonicMultiples] = useState<boolean>(false);
   const [selectedMultiplier, setSelectedMultiplier] = useState<number>(multipliers[2].value); // Default to 1x
+    const [beatDivisionIndex, setBeatDivisionIndex] = useState<number>(initialBeatDivisionIndex);
+
+    const [frequency, setFrequency] = useState<number>(initialRootNote.frequency * Math.pow(2, semitoneOffset / 12));
+    const [timePerCycle, setTimePerCycle] = useState<number>(1000 / (initialRootNote.frequency * Math.pow(2, semitoneOffset / 12)));
+    const [musicalDelayTime, setMusicalDelayTime] = useState<number>(timePerCycle * multiplier);
+    const [beatTime, setBeatTime] = useState<number>(60000 / tempo);
+    const [beatRatio, setBeatRatio] = useState<number>(musicalDelayTime / beatTime);
+    const [closestNoteDivision, setClosestNoteDivision] = useState<string>(getClosestNoteDivision(beatRatio));
+
+    const [chakra, setChakra] = useState<string>(matchChakra(initialRootNote.note));
+    const [masterNumber, setMasterNumber] = useState<number>(closestMasterNumber(initialTempo));
+    const [angelInterval, setAngelInterval] = useState<number | null>(matchAngelInterval(initialRootNote.frequency));
+    const [beatDivisionLabel, setBeatDivisionLabel] = useState<string>(beatDivisions[initialBeatDivisionIndex]);
 
   // useEffect hook to recalculate values when tempo, root note, or multiplier changes
   useEffect(() => {
-    const newFrequency = rootNote.frequency * Math.pow(2, semitoneOffset / 12);
-    setFrequency(newFrequency);
-    setTimePerCycle(1000 / newFrequency);
-    setBeatTime(60000 / tempo);
-    setMusicalDelayTime(timePerCycle * (useHarmonicMultiples ? selectedMultiplier : multiplier));
-  }, [tempo, rootNote, multiplier, semitoneOffset, selectedMultiplier, useHarmonicMultiples, timePerCycle]);
+      // Calculate frequency based on root note and semitone offset
+      const newFrequency = rootNote.frequency * Math.pow(2, semitoneOffset / 12);
+      setFrequency(newFrequency);
+      const newTimePerCycle = 1000 / newFrequency;
+      setTimePerCycle(newTimePerCycle);
 
-  useEffect(() => {
-      const newBeatRatio = musicalDelayTime / beatTime;
+      const selectedMultiplierValue = useHarmonicMultiples ? selectedMultiplier : multiplier;
+      const newMusicalDelayTime = newTimePerCycle * selectedMultiplierValue;
+      setMusicalDelayTime(newMusicalDelayTime);
+
+      // Calculate beat time
+      const newBeatTime = 60000 / tempo;
+      setBeatTime(newBeatTime);
+
+      setChakra(matchChakra(rootNote.note));
+      setMasterNumber(closestMasterNumber(tempo));
+      setAngelInterval(matchAngelInterval(newFrequency));
+      setBeatDivisionLabel(beatDivisions[beatDivisionIndex]);
+
+      const newBeatRatio = newMusicalDelayTime / newBeatTime;
       setBeatRatio(newBeatRatio);
       setClosestNoteDivision(getClosestNoteDivision(newBeatRatio));
-  }, [musicalDelayTime, beatTime]);
+  }, [tempo, rootNote, multiplier, semitoneOffset, selectedMultiplier, useHarmonicMultiples, beatDivisionIndex]);
+
+    useEffect(() => {
+        const newBeatRatio = musicalDelayTime / beatTime;
+        setBeatRatio(newBeatRatio);
+        setClosestNoteDivision(getClosestNoteDivision(newBeatRatio));
+    }, [musicalDelayTime, beatTime]);
 
     // Handler for semitone offset input change
     const handleSemitoneOffsetChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -184,7 +255,7 @@ export default function Home() {
     setMultiplier(initialMultiplier);
     setSemitoneOffset(initialSemitoneOffset);
     setBeatDivisionIndex(initialBeatDivisionIndex);
-    setSelectedMultiplier(multipliers[2].value)
+      setSelectedMultiplier(multipliers[2].value);
     setUseHarmonicMultiples(false)
   };
 
@@ -237,6 +308,43 @@ export default function Home() {
         Math.abs(curr.value - ratio) < Math.abs(prev.value - ratio) ? curr : prev
       );
       return closest.label;
+    }
+
+    // ----------------------
+    // 3. MAIN CALCULATOR
+    // ----------------------
+
+    function calculateHarmonicDelay() {
+        const newFrequency = rootNote.frequency * Math.pow(2, semitoneOffset / 12);
+
+        const newTimePerCycle = 1000 / newFrequency;
+
+        const newMusicalDelayTime = newTimePerCycle * multiplier;
+
+        const newBeatTime = 60000 / tempo;
+
+        const newBeatRatio = newMusicalDelayTime / newBeatTime;
+
+        setFrequency(newFrequency);
+        setTimePerCycle(newTimePerCycle);
+        setMusicalDelayTime(newMusicalDelayTime);
+        setBeatTime(newBeatTime);
+        setBeatRatio(newBeatRatio);
+        setClosestNoteDivision(getClosestNoteDivision(newBeatRatio));
+
+        // Matches
+        setChakra(matchChakra(rootNote.note));
+        setMasterNumber(closestMasterNumber(tempo));
+        setAngelInterval(matchAngelInterval(newFrequency));
+        setBeatDivisionLabel(beatDivisions[beatDivisionIndex]);
+
+        return {
+            frequency: newFrequency,
+            timePerCycle: newTimePerCycle,
+            musicalDelayTime: newMusicalDelayTime,
+            beatTime: newBeatTime,
+            beatRatio: newBeatRatio
+        };
     }
 
   return (
@@ -367,7 +475,7 @@ export default function Home() {
                       aria-label="Beat Division"
                     />
                 )}
-                
+
               </div>
               <Button type="button" onClick={handleReset}>
                 Reset
@@ -402,6 +510,21 @@ export default function Home() {
                     <div className="text-lg font-semibold text-lime-500">
                     ~ {closestNoteDivision} of a beat
                     </div>
+                </div>
+
+                <div className="grid gap-2">
+                    <Label>Chakra Alignment:</Label>
+                    <div className="text-lg font-semibold text-lime-500">{chakra}</div>
+                </div>
+
+                <div className="grid gap-2">
+                    <Label>Closest Master Number:</Label>
+                    <div className="text-lg font-semibold text-lime-500">{masterNumber}</div>
+                </div>
+
+                <div className="grid gap-2">
+                    <Label>Angel Interval Match:</Label>
+                    <div className="text-lg font-semibold text-lime-500">{angelInterval ? `${angelInterval} Hz` : "No match"}</div>
                 </div>
             </CardContent>
           </Card>
