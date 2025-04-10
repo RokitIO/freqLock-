@@ -86,15 +86,27 @@ export default function Home() {
     setMultiplier(initialMultiplier);
   };
 
+  const handleTempoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(event.target.value);
+    if (!isNaN(value) && value >= 30 && value <= 240) {
+      setTempo(value);
+    }
+  };
+
   // Piano key component
-  const PianoKey = ({ note, frequency, isBlack }: { note: string; frequency: number; isBlack: boolean }) => (
-    <button
-      className={`relative z-10 h-24 ${isBlack ? 'w-6 bg-black text-white top-14 mx-1 z-20' : 'w-12 bg-white text-black border-2 border-gray-200'} rounded-b-md focus:outline-none hover:bg-accent hover:text-accent-foreground`}
-      onClick={() => setRootNote({ note, frequency })}
-    >
-      {/* {note} */}
-    </button>
-  );
+  const PianoKey = ({ note, frequency, isBlack, isSelected }: { note: string; frequency: number; isBlack: boolean; isSelected: boolean }) => {
+    const keyClass = isBlack ? 'bg-black text-white' : 'bg-white text-black border-2 border-gray-200';
+    const selectedClass = isSelected ? 'bg-accent text-accent-foreground' : 'hover:bg-accent hover:text-accent-foreground';
+  
+    return (
+      <button
+        className={`relative z-10 h-20 ${keyClass} ${selectedClass} rounded-b-md focus:outline-none`}
+        style={{ width: isBlack ? '2.5rem' : '3.5rem' }}
+        onClick={() => setRootNote({ note, frequency })}
+      >
+      </button>
+    );
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
@@ -128,12 +140,7 @@ export default function Home() {
                       id="tempo-input"
                       className="w-20"
                       value={tempo.toString()}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value);
-                        if (!isNaN(value) && value >= 30 && value <= 240) {
-                          setTempo(value);
-                        }
-                      }}
+                      onChange={handleTempoChange}
                       min={30}
                       max={240}
                       step={1}
@@ -149,12 +156,14 @@ export default function Home() {
                   <div className="flex">
                     {musicalNotes.map((note) => {
                       const isBlackKey = note.note.includes("#") || note.note.includes("b");
+                      const isSelected = rootNote.note === note.note;
                       return (
                         <PianoKey
                           key={note.note}
                           note={note.note}
                           frequency={note.frequency}
                           isBlack={isBlackKey}
+                          isSelected={isSelected}
                         />
                       );
                     })}
