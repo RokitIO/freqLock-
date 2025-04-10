@@ -102,17 +102,13 @@ export default function Home() {
     setFrequency(newFrequency);
     setTimePerCycle(1000 / newFrequency);
     setBeatTime(60000 / tempo);
-  }, [tempo, rootNote, semitoneOffset]);
+    setMusicalDelayTime(timePerCycle * (useHarmonicMultiples ? selectedMultiplier : multiplier));
+  }, [tempo, rootNote, multiplier, semitoneOffset, selectedMultiplier, useHarmonicMultiples, timePerCycle]);
 
   useEffect(() => {
-      setMusicalDelayTime(timePerCycle * (useHarmonicMultiples ? selectedMultiplier : multiplier));
-  }, [timePerCycle, multiplier, selectedMultiplier, useHarmonicMultiples]);
-
-  // useEffect hook to recalculate beat ratio when musicalDelayTime or beatTime changes
-  useEffect(() => {
-    const newBeatRatio = musicalDelayTime / beatTime;
-    setBeatRatio(newBeatRatio);
-    setClosestNoteDivision(getClosestNoteDivision(newBeatRatio));
+      const newBeatRatio = musicalDelayTime / beatTime;
+      setBeatRatio(newBeatRatio);
+      setClosestNoteDivision(getClosestNoteDivision(newBeatRatio));
   }, [musicalDelayTime, beatTime]);
 
     // Handler for semitone offset input change
@@ -188,6 +184,8 @@ export default function Home() {
     setMultiplier(initialMultiplier);
     setSemitoneOffset(initialSemitoneOffset);
     setBeatDivisionIndex(initialBeatDivisionIndex);
+    setSelectedMultiplier(multipliers[2].value)
+    setUseHarmonicMultiples(false)
   };
 
   const handleTempoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -369,13 +367,7 @@ export default function Home() {
                       aria-label="Beat Division"
                     />
                 )}
-                <Input
-                  type="text"
-                  id="multiplier-input"
-                  className="w-full"
-                  value={useHarmonicMultiples ? selectedMultiplier.toString() : beatDivisions[beatDivisionIndex] || "1/4 note"}
-                  readOnly
-                />
+                
               </div>
               <Button type="button" onClick={handleReset}>
                 Reset
