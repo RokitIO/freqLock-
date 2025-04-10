@@ -276,7 +276,7 @@ export default function Home() {
                   min={0}
                   max={beatDivisions.length - 1}
                   step={1}
-                  defaultValue={[beatDivisionIndex]}
+                  defaultValue={[initialBeatDivisionIndex]}
                   onValueChange={(value) => {
                     if (value && value.length > 0) {
                       handleMultiplierChange(value);
