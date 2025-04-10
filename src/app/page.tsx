@@ -137,7 +137,7 @@ export default function Home() {
                     id="tempo"
                     min={30}
                     max={240}
-                    step={0.1}
+                    step={1}
                     defaultValue={[tempo]}
                     onValueChange={(value) => setTempo(parseFloat(value[0].toFixed(1)))}
                     aria-label="Tempo in beats per minute"
