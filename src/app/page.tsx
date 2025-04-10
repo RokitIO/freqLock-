@@ -37,6 +37,9 @@ const initialSemitoneOffset = 0;
 const initialBeatDivisionIndex = 5; // Index of "1/4 note"
 
 const beatDivisions = [
+    "64x",
+    "32x",
+    "16x",
     "8x",
     "4x",
     "2x Dotted 1/2 note",
@@ -99,6 +102,12 @@ export default function Home() {
     // Function to convert beat division/multiple to a multiplier
     const beatDivisionToMultiplier = (beatDivision: string): number => {
       switch (beatDivision) {
+        case "64x":
+            return 64;
+        case "32x":
+            return 32;
+        case "16x":
+          return 16;
         case "8x":
           return 8;
         case "4x":
@@ -289,6 +298,7 @@ export default function Home() {
                   max={beatDivisions.length - 1}
                   step={1}
                   defaultValue={[initialBeatDivisionIndex]}
+                    value={[beatDivisionIndex]}
                   onValueChange={(value) => {
                     if (value && value.length > 0) {
                       handleMultiplierChange(value);
@@ -345,5 +355,4 @@ export default function Home() {
     </div>
   );
 }
-
 
