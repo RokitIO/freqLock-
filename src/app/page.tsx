@@ -151,8 +151,8 @@ export default function Home() {
     const [chakraEnergy, setChakraEnergy] = useState<string>("");
     const [chakraColor, setChakraColor] = useState<string>("");
 
-    const [scaleNotes, setScaleNotes] = useState(['C', 'D', 'E', 'F', 'G', 'A', 'B']);
-    const [chordNotes, setChordNotes] = useState(['C', 'E', 'G']);
+    const [scaleNotes, setScaleNotes] = useState<string[]>(['C', 'D', 'E', 'F', 'G', 'A', 'B']);
+    const [chordNotes, setChordNotes] = useState<string[]>(['C', 'E', 'G']);
     const [scaleType, setScaleType] = useState<string>("major");
     const [chordType, setChordType] = useState<string>("major");
 
@@ -177,8 +177,8 @@ export default function Home() {
         setChakraEnergy(chakraData ? chakraData.energy : "Unknown");
         setChakraColor(chakraData ? chakraData.color : "grey");
 
-        setScaleNotes(generateScale("C", scaleType));
-        setChordNotes(generateChord("C", chordType));
+        setScaleNotes(generateScale(rootNote.note[0], scaleType));
+        setChordNotes(generateChord(rootNote.note[0], chordType));
     }, [tempo, rootNote, multiplier, semitoneOffset, selectedMultiplier, useHarmonicMultiples, beatDivisionIndex, scaleType, chordType]);
 
     // Handlers
@@ -588,5 +588,6 @@ function getMetaphysicalInfo(note: string) {
         energy: "—"
     };
 }
+
 
 
