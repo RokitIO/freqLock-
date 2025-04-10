@@ -1,11 +1,9 @@
 "use client";
 import type { Mode } from "@/lib/scale";
-import clsx from "clsx";
-import { useState, useEffect } from 'react';
-import { Input } from "@/components/ui/input";
+import { useState, useEffect } from "react";
+import { Input, input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
@@ -15,10 +13,16 @@ import { cn } from "@/lib/utils";
 // 1. CONFIGS & DATASETS
 // ----------------------
 
-interface MusicalNote { note: string; midiNote: number; frequency: number; }
+interface MusicalNote {
+    
+    note: string;
+    midiNote: number;
+    frequency: number;
+}
 
 const musicalNotes: MusicalNote[] = [ //added sharps to this as well
     { note: "C3", midiNote: 48, frequency: 130.81 },
+    
     { note: "C#3", midiNote: 49, frequency: 138.59 },
     { note: "D3", midiNote: 50, frequency: 146.83 },
     { note: "D#3", midiNote: 51, frequency: 155.56 },
@@ -30,6 +34,7 @@ const musicalNotes: MusicalNote[] = [ //added sharps to this as well
     { note: "A3", midiNote: 57, frequency: 220.00 },
     { note: "A#3", midiNote: 58, frequency: 233.08 },
     { note: "B3", midiNote: 59, frequency: 246.94 },
+    
     { note: "C4", midiNote: 60, frequency: 261.63 },
     { note: "C#4", midiNote: 61, frequency: 277.18 },
     { note: "D4", midiNote: 62, frequency: 293.66 },
@@ -42,6 +47,7 @@ const musicalNotes: MusicalNote[] = [ //added sharps to this as well
     { note: "A4", midiNote: 69, frequency: 440.00 },
     { note: "A#4", midiNote: 70, frequency: 466.16 },
     { note: "B4", midiNote: 71, frequency: 493.88 },
+    
     { note: "C4", midiNote: 60, frequency: 261.63 },
 ];
 
@@ -56,7 +62,7 @@ const chakraModes = {
     "B": { chakra: "Crown", color: "Violet", westernFreq: 246.94, solfeggioFreq: 963, energy: "Spirituality | Enlightenment | Connection" }
 };
 
-const sealPoints = {
+const sealPoints: { [key: string]: { label: string; emoji: string; energy: string } } = {
     "C": { label: "Foundation", emoji: "🟫", energy: "Grounding | Power | Presence" },
     "D": { label: "Motion", emoji: "🌊", energy: "Flow | Desire | Creativity" },
     "E": { label: "Drive", emoji: "🔥", energy: "Confidence | Action | Radiance" },
@@ -105,7 +111,7 @@ const multipliers = [
     { label: '64x', value: 64 },
 ];
 
-// Master numbers (numerology)
+
 const masterNumbers = [11, 22, 33, 44, 55, 66, 77, 88, 99, 111];
 
 // Common angel number intervals in Hz
@@ -151,6 +157,8 @@ const beatDivisionToMultiplier = (beatDivision: string): number => {
     }
 };
 
+
+import { Button } from "@/components/ui/button";
 // ----------------------
 // 3. React functional component for the Home page
 export default function Home() {
@@ -240,26 +248,36 @@ export default function Home() {
 
 
     const PianoKey = ({ note, midiNote, frequency, isBlack, isSelected }: { note: string; midiNote: number; frequency: number; isBlack: boolean; isSelected: boolean }) => {
+
+        const getPianoKeyClass = (isBlackKey: boolean, isSelected: boolean) => {
+            const baseClass = "inline-block focus:outline-none border text-xs";
+            const colorClass = isBlackKey ? "bg-black text-white" : "bg-white border-2 border-gray-200";
+            const selectedClass = isSelected ? "bg-accent text-accent-foreground" : "hover:bg-accent hover:text-accent-foreground";
+
+            return `${baseClass} ${colorClass} ${selectedClass}`;
+        };
+
+        const keyClass = getPianoKeyClass(isBlack, isSelected);
+
         
-        
-        const keyWidth = isBlack ? '1.5rem' : '2rem';
-        const keyHeight = isBlack ? '3rem' : '5rem';
-        const keyClass = isBlack ? 'bg-black text-white z-10 relative mx-[1px]' : 'bg-white text-black border-2 border-gray-200 relative mx-[1px]';
-        const selectedClass = isSelected ? 'bg-accent text-accent-foreground' : 'hover:bg-accent hover:text-accent-foreground';
-        
-        const isLocked = false;
-        
-                return (
-                    <button
-                        className={clsx(`relative z-10 ${keyClass} ${selectedClass} focus:outline-none`)}
-                        style={{ width: keyWidth, height: keyHeight }}
-                        onClick={() => setRootNote({ note, midiNote, frequency })}
-                       
+        return (            
+            <button
+              key={note}
+              className={keyClass}
+              style={{ width: '2.5rem', height: '6rem' }}
+              onClick={() => setRootNote({ note, midiNote, frequency })}
             >
-                <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs">{note}</span>
+              <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs">
+                {note}
+              </span>
             </button>
-        );
+        );        
+        
+        
+        
+        
     };
+
 
     // Function to get the closest musical note division
     function getClosestNoteDivision(ratio: number): string {
@@ -281,7 +299,7 @@ export default function Home() {
     // Use Effect to set the scale notes.
      useEffect(() => {
         const root = rootNote.note.replace(/[0-9]/g, '');
-        setScaleNotes(generateScale(root, scaleType)); 
+        setScaleNotes(generateScale(root, scaleType));
     }, [rootNote, scaleType]);
 
     const handleChordTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -291,8 +309,8 @@ export default function Home() {
 
     // Function to sort notes by frequency
     const sortNotesByFrequency = (notesArr: string[]): string[] => {
-       
-        
+
+
         return [...notesArr].sort((a, b) => {
             return getNoteIndex(a) - getNoteIndex(b);
         });
@@ -303,10 +321,17 @@ export default function Home() {
         return sealPoints[root] || {
             label: "—",
             emoji: "—",
-            energy: "—"
+            energy: "—",
         };
     };
+    const copyToClipboard = async (text: string) => {
+        try {
+            await navigator.clipboard.writeText(text);
+        } catch (err) {
+            console.error('Failed to copy: ', err);
+        }
 
+    };
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
@@ -316,7 +341,7 @@ export default function Home() {
                 </h1>
                 <h2 className="text-lg md:text-2xl font-bold text-teal-800 mb-4">🔊🎚️ Harmonic Delay Calculator for Tuned Echo Perfection</h2>
 
-                <div className="flex flex-col space-y-6 p-4 max-w-md mx-auto">
+                <div className="max-w-md mx-auto space-y-6 p-4">
                  {/* Input Section */}
                     <Card className="p-4 rounded-lg shadow-md bg-white">
                         <CardHeader>
@@ -331,7 +356,7 @@ export default function Home() {
                                         id="tempo"
                                         min={30}
                                         max={240}
-                                        step={1}                                        
+                                        step={1}
                                         defaultValue={[tempo]}
                                         onValueChange={(value) => setTempo(parseFloat(value[0].toFixed(1)))}
                                         aria-label="Tempo in beats per minute"
@@ -353,26 +378,30 @@ export default function Home() {
                             <div className="grid gap-2">
                                 <Label>Root Note</Label>
                                 <div className="flex justify-center items-center py-2">
-                                    {/* Piano Keyboard */}
-                                    <div className="flex overflow-x-auto" style={{ width: 'fit-content', minWidth: '400px' }}>
-                                      
-
-
-                                        {musicalNotes.map((note) => {
-                                            const isBlackKey = note.note.includes("#") || note.note.includes("b");
-                                            const isSelected = rootNote.note === note.note;
-                                            return (
-                                                <PianoKey
-                                                    key={note.note}
-                                                    note={note.note}
-                                                    midiNote={note.midiNote}
-                                                    frequency={note.frequency}
-                                                    isBlack={isBlackKey}
-                                                    isSelected={isSelected}
-                                                />
-                                            );
-                                        })}
+                                     <div className="w-full overflow-x-auto px-2">
+                                        <div className="relative">
+                                            <div className="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-white to-transparent z-10" />
+                                           <div className="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-white to-transparent z-10" />
+                                            <div className="overflow-x-auto whitespace-nowrap px-6 relative z-20">
+                                                {musicalNotes.map((note) => {
+                                                    const isBlackKey = note.note.includes("#") || note.note.includes("b");
+                                                    const isSelected = rootNote.note === note.note;
+                                                    return (
+                                                       
+                                                          <PianoKey
+                                                            key={note.note}
+                                                            note={note.note}
+                                                            midiNote={note.midiNote}
+                                                            frequency={note.frequency}
+                                                            isBlack={isBlackKey}
+                                                            isSelected={isSelected}
+                                                        />
+                                                );
+                                                })}
+                                                </div>
+                                        </div>
                                     </div>
+
                                 </div>                                
                             </div>
 
@@ -412,8 +441,8 @@ export default function Home() {
                                 {useHarmonicMultiples ? (
                                     <Select onValueChange={(value) => setSelectedMultiplier(parseFloat(value))}>
                                         <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Select a multiplier" />
-                                        </SelectTrigger>                                        
+                                            <SelectValue placeholder="Select a multiplier" />                                                                       
+                                        </SelectTrigger>
                                         <SelectContent>
                                             {multipliers.map((multiplier) => (
                                                 <SelectItem key={multiplier.value} value={multiplier.value.toString()}>
@@ -424,7 +453,7 @@ export default function Home() {
                                     </Select>
                                 ) : (
                                     <Slider
-                                        id="multiplier"
+                                       id="multiplier"
                                         min={0}
                                         max={beatDivisions.length - 1}
                                         step={1}
@@ -468,24 +497,32 @@ export default function Home() {
                             <div className="grid gap-2">
                                 <Label>1 Beat:</Label>
                                 <div className="text-lg font-semibold text-lime-500">{Number(beatTime).toFixed(2)} ms</div>                                
+                            
                             </div>
                             <div className="grid gap-2">
                                 <Label>Comparison to Beat Divisions:</Label>
                                 <div className="text-lg font-semibold text-lime-500">
-                                    ~ {closestNoteDivision} of a beat
-                                </div>
+                                   ~ {closestNoteDivision} of a beat </div>
                             </div>
-                             <div className="grid gap-2">
+                           
+                            <div className="grid gap-2">
                                 <Label>SealPoint Alignment:</Label>
                                 <div className="text-lg font-semibold text-lime-500">
                                     {(() => {
                                         const sealPointInfo = getSealPointInfo(rootNote.note);
-                                        return (
-                                            <>
-                                                {sealPointInfo.emoji} {sealPointInfo.label}
-                                                <div>{sealPointInfo.energy}</div>
-                                            </>
-                                        );
+                                         const copyText = `${sealPointInfo.emoji} ${sealPointInfo.label} ${sealPointInfo.energy}`;
+
+                                         return (
+                                            
+                                                <Button type="button" onClick={() => copyToClipboard(copyText)}>
+                                                    {sealPointInfo.emoji} {sealPointInfo.label}                                                 
+                                                 </Button>
+                                            
+                                                
+                                                 
+                                        );                                          
+                                        
+                                        
                                     })()}
                                 </div>
                             </div>
@@ -493,20 +530,21 @@ export default function Home() {
                     </Card>
 
                     {/* Scales Section */}
-                    <Card className="p-4 rounded-lg shadow-md bg-white max-w-md">
+                    <Card className="p-4 rounded-lg shadow-md bg-white grid grid-cols-1 md:grid-cols-2 gap-4">
                         <CardHeader>
                             <CardTitle>Scale Generator</CardTitle>
                         </CardHeader>
-                        <CardContent className="grid gap-4">                           
-                           <div className="grid gap-2">                                
+                        <CardContent className="grid gap-4">
+                            <div className="grid gap-2">
                                 <Label className="max-w-[150px]"htmlFor="scaleType">Scale Type</Label>
                                 <Select value={scaleType} onValueChange={(value) => setScaleType(value)}>
                                     <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Select a scale type" />
-                                    </SelectTrigger>
+                                    </SelectTrigger>                                    
                                     <SelectContent>
                                         <SelectItem value="major">Major</SelectItem>
                                         <SelectItem value="minor">Minor</SelectItem>
+                                        
                                         <SelectItem value="Dorian">Dorian</SelectItem>
                                         <SelectItem value="Lydian">Lydian</SelectItem>
                                         <SelectItem value="Phrygian">Phrygian</SelectItem>
@@ -514,6 +552,7 @@ export default function Home() {
                                 </Select> 
                             </div>
                            <div className="grid gap-2">
+
                                 <Label>Scale Notes:</Label>
                                 <div>{sortNotesByFrequency(scaleNotes).map((note, index) => <span key={note + index}>{`${note} (${noteFrequencies[note] || "N/A"} Hz)`} </span>).reduce((prev, curr) => [prev, ', ', curr])}</div>
                             </div>
@@ -521,7 +560,7 @@ export default function Home() {
                     </Card>
                     
                     {/* Chords Section */}
-                    <Card className="p-4 rounded-lg shadow-md bg-white max-w-md">
+                    <Card className="p-4 rounded-lg shadow-md bg-white grid grid-cols-1 md:grid-cols-2 gap-4">
                         <CardHeader>
                             <CardTitle>Chord Library</CardTitle>
                         </CardHeader>                        
@@ -540,6 +579,7 @@ export default function Home() {
                                         <SelectItem value="maj7">Major 7th</SelectItem>
                                         <SelectItem value="min7">Minor 7th</SelectItem>
                                         <SelectItem value="dom7">Dominant 7th</SelectItem>
+                                        
                                         <SelectItem value="sus2">Suspended 2nd</SelectItem>
                                         <SelectItem value="sus4">Suspended 4th</SelectItem>
                                     </SelectContent>
@@ -556,6 +596,7 @@ export default function Home() {
             </main>
         </div>
     );
+    
 }
 
 const notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
@@ -563,7 +604,7 @@ const notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 const noteFrequencies: { [key: string]: number } = {
     "C": 261.63, "C#": 277.18, "Db": 277.18, // C#/Db
     "D": 293.66, "D#": 311.13, "Eb": 311.13, // D#/Eb
-    "E": 329.63, "F": 349.23, "F#": 369.99,  // F#/Gb
+    "E": 329.63, "F": 349.23, "F#": 369.99, // F#/Gb
     "Gb": 369.99, "G": 392.00, "G#": 415.30, // G#/Ab
     "Ab": 415.30, "A": 440.00, "A#": 466.16, // A#/Bb
     "Bb": 466.16, "B": 493.88               
@@ -603,7 +644,7 @@ const chordPatterns = {
 
 function getFrequencies(notesArr: string[]) {
     return notesArr.map(note => ({
-        note: note,
+        note: note,  
         freq: noteFrequencies[note] || "N/A"
     }));    
 }
