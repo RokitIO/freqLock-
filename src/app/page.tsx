@@ -52,7 +52,7 @@ const initialBeatDivisionIndex = 11;
 const beatDivisions = [
     "64x", "32x", "16x", "8x", "4x", "2x Dotted 1/2 note", "2x", "Dotted 1/2 note",
     "1/2 note", "1/2 note triplets", "Dotted 1/4 note", "1/4 note", "1/4 note triplets",
-    "Dotted 1/8 note", "1/8 note", "1/8 note triplets", "Dotted 1/16 note", "1/16 note",
+    "Dotted 1/8 note", "1/8 note triplets", "Dotted 1/16 note", "1/16 note",
     "1/16 note triplets", "Dotted 1/32 note", "1/32 note", "1/32 note triplets",
     "Dotted 1/64 note", "1/64 note", "1/64 note triplets"
 ];
@@ -473,3 +473,78 @@ export default function Home() {
     }
 }
 
+const notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+
+const noteFrequencies = {
+    "C": 261.63, "C#": 277.18, "D": 293.66, "D#": 311.13,
+    "E": 329.63, "F": 349.23, "F#": 369.99, "G": 392.00,
+    "G#": 415.30, "A": 440.00, "A#": 466.16, "B": 493.88
+};
+
+function getNoteIndex(note: string) {
+    return notes.indexOf(note);
+}
+
+function transposeNote(root: string, interval: number) {
+    const rootIndex = getNoteIndex(root);
+    return notes[(rootIndex + interval) % 12];
+}
+
+const scalePatterns = {
+    major: [0, 2, 4, 5, 7, 9, 11],
+    minor: [0, 2, 3, 5, 7, 8, 10],
+    dorian: [0, 2, 3, 5, 7, 9, 10],
+    lydian: [0, 2, 4, 6, 7, 9, 11],
+    phrygian: [0, 1, 3, 5, 7, 8, 10]
+};
+
+function generateScale(root: string, type: string = "major") {
+    const pattern = scalePatterns[type as keyof typeof scalePatterns];
+    const scale = pattern.map(interval => transposeNote(root, interval));
+    return scale;
+}
+
+const chordPatterns = {
+    major: [0, 4, 7],
+    minor: [0, 3, 7],
+    dim: [0, 3, 6],
+    aug: [0, 4, 8],
+    maj7: [0, 4, 7, 11],
+    min7: [0, 3, 7, 10],
+    dom7: [0, 4, 7, 10],
+    sus2: [0, 2, 7],
+    sus4: [0, 5, 7]
+};
+
+function generateChord(root: string, type: string = "major") {
+    const pattern = chordPatterns[type as keyof typeof chordPatterns];
+    const chord = pattern.map(interval => transposeNote(root, interval));
+    return chord;
+}
+
+function getFrequencies(notesArr: string[]) {
+    return notesArr.map(note => ({
+        note,
+        freq: noteFrequencies[note] || "N/A"
+    }));
+}
+
+const metaphysicalMap = {
+    "C": { chakra: "Root", mood: "Grounding", symbol: "⛰️", energy: "Safety | Earth | Stability" },
+    "D": { chakra: "Sacral", mood: "Creative", symbol: "💧", energy: "Desire | Motion | Emotion" },
+    "E": { chakra: "Solar Plexus", mood: "Powerful", symbol: "🔥", energy: "Will | Confidence | Action" },
+    "F": { chakra: "Heart", mood: "Loving", symbol: "💚", energy: "Compassion | Connection | Healing" },
+    "G": { chakra: "Throat", mood: "Expressive", symbol: "🔵", energy: "Truth | Voice | Resonance" },
+    "A": { chakra: "Third Eye", mood: "Visionary", symbol: "🌀", energy: "Insight | Intuition | Imagination" },
+    "B": { chakra: "Crown", mood: "Spiritual", symbol: "👑", energy: "Unity | Light | Transcendence" }
+};
+
+function getMetaphysicalInfo(note: string) {
+    const root = note[0]; // handle "C#", "D#", etc.
+    return metaphysicalMap[root] || {
+        chakra: "—",
+        mood: "—",
+        symbol: "—",
+        energy: "—"
+    };
+}
