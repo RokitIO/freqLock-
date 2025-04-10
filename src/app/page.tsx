@@ -261,6 +261,11 @@ export default function Home() {
         setChordType(event.target.value);
     };
 
+    // Function to sort notes by frequency
+    const sortNotesByFrequency = (notes: string[]): string[] => {
+        return [...notes].sort((a, b) => (noteFrequencies[a] || 0) - (noteFrequencies[b] || 0));
+    };
+
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
             <main className="flex flex-col items-center justify-center w-full flex-1 px-4 sm:px-20 text-center">
@@ -471,7 +476,7 @@ export default function Home() {
                             </div>
                             <div className="grid gap-2">
                                 <Label>Scale Notes:</Label>
-                                <div>{scaleNotes.map(note => `${note} (${noteFrequencies[note] || "N/A"} Hz)`).join(' - ')}</div>
+                                <div>{sortNotesByFrequency(scaleNotes).map(note => `${note} (${noteFrequencies[note] || "N/A"} Hz)`).join(' - ')}</div>
                             </div>
                         </CardContent>
                     </Card>
@@ -588,6 +593,7 @@ function getMetaphysicalInfo(note: string) {
         energy: "—"
     };
 }
+
 
 
 
