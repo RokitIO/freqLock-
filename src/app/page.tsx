@@ -34,10 +34,13 @@ const initialTempo = 120;
 const initialRootNote = musicalNotes[0]; // Default to C3
 const initialMultiplier = 0.25;
 const initialSemitoneOffset = 0;
-const initialBeatDivisionIndex = 4; // Index of "1/4 note"
+const initialBeatDivisionIndex = 5; // Index of "1/4 note"
 
 const beatDivisions = [
+    "8x",
+    "4x",
     "2x Dotted 1/2 note",
+    "2x",
     "Dotted 1/2 note",
     "1/2 note",
     "1/2 note triplets",
@@ -96,8 +99,14 @@ export default function Home() {
     // Function to convert beat division/multiple to a multiplier
     const beatDivisionToMultiplier = (beatDivision: string): number => {
       switch (beatDivision) {
+        case "8x":
+          return 8;
+        case "4x":
+          return 4;
         case "2x Dotted 1/2 note":
           return 1.5;
+        case "2x":
+          return 2;
         case "Dotted 1/2 note":
           return 0.75;
         case "1/2 note":
