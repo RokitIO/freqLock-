@@ -93,6 +93,7 @@ export default function Home() {
         style={{ width: isBlack ? '1.75rem' : '2.5rem', height: '5rem' }}
         onClick={() => setRootNote({ note, frequency })}
       >
+        <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs">{note}</span>
       </button>
     );
   };
