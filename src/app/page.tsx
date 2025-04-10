@@ -61,21 +61,25 @@ export default function Home() {
     setBeatRatio(musicalDelayTime / beatTime);
   }, [musicalDelayTime, beatTime]);
 
-  // Handler for multiplier input change
-  const handleMultiplierChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(event.target.value);
-    if (!isNaN(value) && value >= 0.25 && value <= 4) {
-      setMultiplier(value);
-    }
-  };
-
     // Handler for semitone offset input change
     const handleSemitoneOffsetChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       const value = parseFloat(event.target.value);
-      if (!isNaN(value) && value >= -12 && value <= 12) {
+      if (!isNaN(value) && value >= -24 && value <= 24) {
         setSemitoneOffset(value);
       }
     };
+
+    // Function to convert beat division/multiple to a multiplier
+    const beatDivisionToMultiplier = (beatDivision: number): number => {
+      return 1 / beatDivision;
+    };
+
+    const handleMultiplierChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = parseFloat(event.target.value);
+        if (!isNaN(value) && value >= 1 && value <= 16) {
+          setMultiplier(beatDivisionToMultiplier(value));
+        }
+      };
 
   // Handler for resetting the input fields
   const handleReset = () => {
@@ -180,8 +184,8 @@ export default function Home() {
                 <div className="flex items-center space-x-2">
                   <Slider
                     id="semitoneOffset"
-                    min={-12}
-                    max={12}
+                    min={-24}
+                    max={24}
                     step={1}
                     defaultValue={[semitoneOffset]}
                     onValueChange={(value) => setSemitoneOffset(value[0])}
@@ -193,8 +197,8 @@ export default function Home() {
                     className="w-20"
                     value={semitoneOffset.toString()}
                     onChange={handleSemitoneOffsetChange}
-                    min={-12}
-                    max={12}
+                    min={-24}
+                    max={24}
                     step={1}
                   />
                 </div>
@@ -202,26 +206,26 @@ export default function Home() {
 
               {/* Multiplier Input */}
               <div className="grid gap-2">
-                <Label htmlFor="multiplier">Multiplier</Label>
+                <Label htmlFor="multiplier">Beat Division</Label>
                 <div className="flex items-center space-x-2">
                   <Slider
                     id="multiplier"
-                    min={0.25}
-                    max={4}
-                    step={0.05}
-                    defaultValue={[multiplier]}
-                    onValueChange={(value) => setMultiplier(value[0])}
+                    min={1}
+                    max={16}
+                    step={1}
+                    defaultValue={[1 / multiplier]}
+                    onValueChange={(value) => setMultiplier(beatDivisionToMultiplier(value[0]))}
                     aria-label="Multiplier for delay time"
                   />
                   <Input
                     type="number"
                     id="multiplier-input"
                     className="w-20"
-                    value={multiplier.toString()}
+                    value={(1/multiplier).toString()}
                     onChange={handleMultiplierChange}
-                    min={0.25}
-                    max={4}
-                    step={0.01}
+                    min={1}
+                    max={16}
+                    step={1}
                   />
                 </div>
               </div>
