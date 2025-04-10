@@ -307,7 +307,8 @@ export default function Home() {
         <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
             <main className="flex flex-col items-center justify-center w-full flex-1 px-4 sm:px-20 text-center">
                 <h1 className="text-2xl md:text-4xl font-bold text-teal-800 mb-4">
-                    Harmonic Delay Calculator
+                💎 FreqLock™
+                <p className="text-base md:text-lg font-semibold text-gray-700">🔊🎚️ Harmonic Delay Calculator for Tuned Echo Perfection</p>
                 </h1>
 
                 <section className="w-full max-w-md">
