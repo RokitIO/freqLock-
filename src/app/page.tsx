@@ -169,8 +169,10 @@ export default function Home() {
   };
 
     const handleMultiplierChange = (value: number[]) => {
+      if (value && value.length > 0) {
         const index = Math.round(value[0]);
         setMultiplier(beatDivisionToMultiplier(beatDivisions[index]));
+      }
     };
 
   return (
@@ -271,14 +273,18 @@ export default function Home() {
                   max={beatDivisions.length - 1}
                   step={1}
                   defaultValue={[beatDivisions.indexOf("1/4 note")]}
-                  onValueChange={(value) => handleMultiplierChange(value)}
+                  onValueChange={(value) => {
+                    if (value && value.length > 0) {
+                      handleMultiplierChange(value);
+                    }
+                  }}
                   aria-label="Beat Division"
                 />
                 <Input
                   type="text"
                   id="multiplier-input"
                   className="w-full"
-                  value={beatDivisions[Math.round(multiplier / 100 * (beatDivisions.length - 1))] || "1/4 note"}
+                  value={beatDivisions[Math.round(multiplier/beatDivisionToMultiplier("1/4 note")*(beatDivisions.length -1))] || "1/4 note"}
                   readOnly
                 />
               </div>
