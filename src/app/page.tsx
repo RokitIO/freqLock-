@@ -50,11 +50,24 @@ const initialSemitoneOffset = 0;
 const initialBeatDivisionIndex = 11;
 
 const beatDivisions = [
-    "64x", "32x", "16x", "8x", "4x", "2x Dotted 1/2 note", "2x", "Dotted 1/2 note",
-    "1/2 note", "1/2 note triplets", "Dotted 1/4 note", "1/4 note", "1/4 note triplets",
-    "Dotted 1/8 note", "1/8 note triplets", "Dotted 1/16 note", "1/16 note",
-    "1/16 note triplets", "Dotted 1/32 note", "1/32 note", "1/32 note triplets",
-    "Dotted 1/64 note", "1/64 note", "1/64 note triplets"
+    "Dotted 1/2 note",
+    "1/2 note",
+    "1/2 note triplets",
+    "Dotted 1/4 note",
+    "1/4 note",
+    "1/4 note triplets",
+    "Dotted 1/8 note",
+    "1/8 note",
+    "1/8 note triplets",
+    "Dotted 1/16 note",
+    "1/16 note",
+    "1/16 note triplets",
+    "Dotted 1/32 note",
+    "1/32 note",
+    "1/32 note triplets",
+    "Dotted 1/64 note",
+    "1/64 note",
+    "1/64 note triplets"
 ];
 
 const multipliers = [
@@ -93,13 +106,6 @@ interface ChakraModes {
 
 const beatDivisionToMultiplier = (beatDivision: string): number => {
     switch (beatDivision) {
-        case "64x": return 64;
-        case "32x": return 32;
-        case "16x": return 16;
-        case "8x": return 8;
-        case "4x": return 4;
-        case "2x Dotted 1/2 note": return 1.5;
-        case "2x": return 2;
         case "Dotted 1/2 note": return 0.75;
         case "1/2 note": return 0.5;
         case "1/2 note triplets": return 1 / 3;
@@ -246,6 +252,14 @@ export default function Home() {
     // Sample scale
     //const [scaleNotes, setScaleNotes] = useState(['C', 'D', 'E', 'F', 'G', 'A', 'B']);
     //const [chordNotes, setChordNotes] = useState(['C', 'E', 'G']);
+
+    const handleScaleTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setScaleType(event.target.value);
+    };
+
+    const handleChordTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setChordType(event.target.value);
+    };
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
@@ -442,7 +456,7 @@ export default function Home() {
                         <CardContent className="grid gap-4">
                             <div className="grid gap-2">
                                 <Label htmlFor="scaleType">Scale Type</Label>
-                                <Select onValueChange={(value) => setScaleType(value)}>
+                                <Select value={scaleType} onValueChange={(value) => setScaleType(value)}>
                                     <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Select a scale type" />
                                     </SelectTrigger>
@@ -470,7 +484,7 @@ export default function Home() {
                         <CardContent className="grid gap-4">
                             <div className="grid gap-2">
                                 <Label htmlFor="chordType">Chord Type</Label>
-                                <Select onValueChange={(value) => setChordType(value)}>
+                                <Select value={chordType} onValueChange={(value) => setChordType(value)}>
                                     <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Select a chord type" />
                                     </SelectTrigger>
@@ -497,22 +511,6 @@ export default function Home() {
             </main>
         </div>
     );
-
-    function getClosestNoteDivision(ratio: number): string {
-        const divisions = [
-            { label: "1/1", value: 1 },
-            { label: "1/2", value: 0.5 },
-            { label: "1/4", value: 0.25 },
-            { label: "1/8", value: 0.125 },
-            { label: "1/16", value: 0.0625 },
-            { label: "1/32", value: 0.03125 },
-            { label: "1/64", value: 0.015625 },
-        ];
-        let closest = divisions.reduce((prev, curr) =>
-            Math.abs(curr.value - ratio) < Math.abs(prev.value - ratio) ? curr : prev
-        );
-        return closest.label;
-    }
 }
 
 const notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
@@ -590,4 +588,5 @@ function getMetaphysicalInfo(note: string) {
         energy: "—"
     };
 }
+
 
