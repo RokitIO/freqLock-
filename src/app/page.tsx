@@ -324,7 +324,6 @@ export default function Home() {
 
         // Matches
         setChakra(matchChakra(rootNote.note));
-        setMasterNumber(closestMasterNumber(tempo));
 
         setBeatDivisionLabel(beatDivisions[beatDivisionIndex]);
 
@@ -506,11 +505,6 @@ export default function Home() {
                     <Label>Chakra Alignment:</Label>
                     <div className="text-lg font-semibold text-lime-500">{chakra}</div>
                 </div>
-
-                <div className="grid gap-2">
-                    <Label>Closest Master Number:</Label>
-                    <div className="text-lg font-semibold text-lime-500">{masterNumber}</div>
-                </div>
             </CardContent>
           </Card>
         </section>
@@ -535,4 +529,5 @@ export default function Home() {
         return closest.label;
     }
 }
+
 
