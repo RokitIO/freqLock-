@@ -37,6 +37,7 @@ const initialSemitoneOffset = 0;
 const initialBeatDivisionIndex = 4; // Index of "1/4 note"
 
 const beatDivisions = [
+    "2x Dotted 1/2 note",
     "Dotted 1/2 note",
     "1/2 note",
     "1/2 note triplets",
@@ -95,6 +96,8 @@ export default function Home() {
     // Function to convert beat division/multiple to a multiplier
     const beatDivisionToMultiplier = (beatDivision: string): number => {
       switch (beatDivision) {
+        case "2x Dotted 1/2 note":
+          return 1.5;
         case "Dotted 1/2 note":
           return 0.75;
         case "1/2 note":
@@ -333,4 +336,5 @@ export default function Home() {
     </div>
   );
 }
+
 
