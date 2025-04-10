@@ -248,12 +248,13 @@ export default function Home() {
         const selectedClass = isSelected ? 'bg-accent text-accent-foreground' : 'hover:bg-accent hover:text-accent-foreground';
 
         const isLocked = false;
-
-        return (        
-            <button
-                className={`relative z-10 ${keyClass} ${selectedClass} ${lockedClass} focus:outline-none`}
-                style={{ width: keyWidth, height: keyHeight }}
-                onClick={() => setRootNote({ note, midiNote, frequency })}
+        
+                return (
+                    <button
+                        className={clsx(`relative z-10 ${keyClass} ${selectedClass} focus:outline-none`)}
+                        style={{ width: keyWidth, height: keyHeight }}
+                        onClick={() => setRootNote({ note, midiNote, frequency })}
+                       
             >
                 <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs">{note}</span>
             </button>
@@ -448,7 +449,7 @@ export default function Home() {
                     </Card>
 
                     {/* Output Section */}                  
-                    <Card className="max-w-md">
+                    <Card className="max-w-md mt-6">
                         <CardHeader>
                             <CardTitle>Calculated Results</CardTitle>
                         </CardHeader>
@@ -493,7 +494,7 @@ export default function Home() {
                     </Card>
 
                     {/* Scales Section */}
-                    <Card className="mb-4">
+                    <Card className="mb-4 max-w-md">
                         <CardHeader>
                             <CardTitle>Scale Generator</CardTitle>
                         </CardHeader>
@@ -521,7 +522,7 @@ export default function Home() {
                     </Card>
 
                     {/* Chords Section */}
-                    <Card className="mb-4 max-w-md">
+                    <Card className="mb-4 max-w-md mt-6">
                         <CardHeader>
                             <CardTitle>Chord Library</CardTitle>
                         </CardHeader>
