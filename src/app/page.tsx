@@ -14,23 +14,6 @@ import { cn } from "@/lib/utils";
 // 1. CONFIGS & DATASETS
 // ----------------------
 
-// Chakra tones mapped to keys (7-tone system)
-const chakraMap = {
-    "C": { chakra: "Root", color: "Red", westernFreq: 130.81, solfeggioFreq: 396, energy: "Grounding | Stability | Presence" },
-    "D": { chakra: "Sacral", color: "Orange", westernFreq: 146.83, solfeggioFreq: 417, energy: "Creativity | Sensuality | Pleasure" },
-    "E": { chakra: "Solar Plexus", color: "Yellow", westernFreq: 164.81, solfeggioFreq: 528, energy: "Willpower | Confidence | Energy" },
-    "F": { chakra: "Heart", color: "Green", westernFreq: 174.61, solfeggioFreq: 639, energy: "Love | Compassion | Healing" },
-    "G": { chakra: "Throat", color: "Blue", westernFreq: 196.00, solfeggioFreq: 741, energy: "Truth | Voice | Resonance" },
-    "A": { chakra: "Third Eye", color: "Indigo", westernFreq: 220.00, solfeggioFreq: 852, energy: "Intuition | Insight | Wisdom" },
-    "B": { chakra: "Crown", color: "Violet", westernFreq: 246.94, solfeggioFreq: 963, energy: "Spirituality | Enlightenment | Connection" }
-};
-
-// Master numbers (numerology)
-const masterNumbers = [11, 22, 33, 44, 55, 66, 77, 88, 99, 111];
-
-// Common angel number intervals in Hz
-const angelIntervals = [111, 222, 333, 444, 555, 666, 777, 888, 999];
-
 interface MusicalNote { note: string; midiNote: number; frequency: number; }
 
 const musicalNotes: MusicalNote[] = [
@@ -48,6 +31,17 @@ const musicalNotes: MusicalNote[] = [
     { note: "B3", midiNote: 59, frequency: 246.94 },
     { note: "C4", midiNote: 60, frequency: 261.63 },
 ];
+
+// Chakra tones mapped to keys (7-tone system)
+const chakraModes = {
+    "C": { chakra: "Root", color: "Red", westernFreq: 130.81, solfeggioFreq: 396, energy: "Grounding | Stability | Presence" },
+    "D": { chakra: "Sacral", color: "Orange", westernFreq: 146.83, solfeggioFreq: 417, energy: "Creativity | Sensuality | Pleasure" },
+    "E": { chakra: "Solar Plexus", color: "Yellow", westernFreq: 164.81, solfeggioFreq: 528, energy: "Willpower | Confidence | Energy" },
+    "F": { chakra: "Heart", color: "Green", westernFreq: 174.61, solfeggioFreq: 639, energy: "Love | Compassion | Healing" },
+    "G": { chakra: "Throat", color: "Blue", westernFreq: 196.00, solfeggioFreq: 741, energy: "Truth | Voice | Resonance" },
+    "A": { chakra: "Third Eye", color: "Indigo", westernFreq: 220.00, solfeggioFreq: 852, energy: "Intuition | Insight | Wisdom" },
+    "B": { chakra: "Crown", color: "Violet", westernFreq: 246.94, solfeggioFreq: 963, energy: "Spirituality | Enlightenment | Connection" }
+};
 
 const initialTempo = 120;
 const initialRootNote = musicalNotes[0];
@@ -74,6 +68,24 @@ const multipliers = [
     { label: '32x', value: 32 },
     { label: '64x', value: 64 },
 ];
+
+// Master numbers (numerology)
+const masterNumbers = [11, 22, 33, 44, 55, 66, 77, 88, 99, 111];
+
+// Common angel number intervals in Hz
+const angelIntervals = [111, 222, 333, 444, 555, 666, 777, 888, 999];
+
+type ChakraType = {
+    chakra: string;
+    color: string;
+    westernFreq: number;
+    solfeggioFreq: number;
+    energy: string;
+}
+
+interface ChakraModes {
+    [key: string]: ChakraType;
+}
 
 // ----------------------
 // 2. UTILITY FUNCTIONS
@@ -149,7 +161,7 @@ export default function Home() {
         setBeatRatio(newBeatRatio);
         setClosestNoteDivision(getClosestNoteDivision(newBeatRatio));
 
-        const chakraData = chakraModes[rootNote.note[0]];
+        const chakraData = chakraModes[rootNote.note[0]] as ChakraType;
         setChakra(chakraData ? chakraData.chakra : "Unknown");
         setChakraEnergy(chakraData ? chakraData.energy : "Unknown");
         setChakraColor(chakraData ? chakraData.color : "grey");
@@ -460,3 +472,4 @@ export default function Home() {
         return closest.label;
     }
 }
+
