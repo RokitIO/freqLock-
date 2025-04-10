@@ -182,6 +182,8 @@ export default function Home() {
     const [chakraColor, setChakraColor] = useState<string>("");
     const [useSolfeggio, setUseSolfeggio] = useState<boolean>(false);
 
+    const [multiplierLabel, setMultiplierLabel] = useState<string>(multipliers[2].label);
+
     // useEffect hook to recalculate values when tempo, root note, or multiplier changes
     useEffect(() => {
         recalculateValues();
@@ -610,4 +612,5 @@ export default function Home() {
         return closest.label;
     }
 }
+
 
