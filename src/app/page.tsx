@@ -73,7 +73,7 @@ export default function Home() {
   useEffect(() => {
     setFrequency(rootNote.frequency * Math.pow(2, semitoneOffset / 12));
     setTimePerCycle(1000 / (rootNote.frequency * Math.pow(2, semitoneOffset / 12)));
-    setMusicalDelayTime((60000 / tempo) * multiplier); // Corrected formula
+    setMusicalDelayTime(timePerCycle * multiplier);
     setBeatTime(60000 / tempo);
   }, [tempo, rootNote, multiplier, semitoneOffset]);
 
@@ -316,12 +316,12 @@ export default function Home() {
                 <Label>1 Beat:</Label>
                 <div className="text-lg font-semibold text-lime-500">{beatTime.toFixed(2)} ms</div>
               </div>
-              <div className="grid gap-2">
-                <Label>Comparison to Beat Divisions:</Label>
-                <div className="text-lg font-semibold text-lime-500">
-                  ~ 1/{(1 / beatRatio).toFixed(0)}th of a beat
+                <div className="grid gap-2">
+                    <Label>Comparison to Beat Divisions:</Label>
+                    <div className="text-lg font-semibold text-lime-500">
+                    ~ 1/{(1 / beatRatio).toFixed(0)}th of a beat
+                    </div>
                 </div>
-              </div>
             </CardContent>
           </Card>
         </section>
