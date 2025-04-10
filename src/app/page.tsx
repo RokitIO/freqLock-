@@ -33,7 +33,7 @@ const musicalNotes: MusicalNote[] = [
 const initialTempo = 120;
 const initialRootNote = musicalNotes[0]; // Default to C3
 const initialMultiplier = 1;
-const initialOctaveMultiplier = 1;
+const initialSemitoneOffset = 0;
 
 // React functional component for the Home page
 export default function Home() {
@@ -41,20 +41,20 @@ export default function Home() {
   const [tempo, setTempo] = useState<number>(initialTempo);
   const [rootNote, setRootNote] = useState<MusicalNote>(initialRootNote);
   const [multiplier, setMultiplier] = useState<number>(initialMultiplier);
-  const [octaveMultiplier, setOctaveMultiplier] = useState<number>(initialOctaveMultiplier);
-  const [frequency, setFrequency] = useState<number>(rootNote.frequency * octaveMultiplier);
-  const [timePerCycle, setTimePerCycle] = useState<number>(1000 / (rootNote.frequency * octaveMultiplier));
+  const [semitoneOffset, setSemitoneOffset] = useState<number>(initialSemitoneOffset);
+  const [frequency, setFrequency] = useState<number>(rootNote.frequency * Math.pow(2, semitoneOffset / 12));
+  const [timePerCycle, setTimePerCycle] = useState<number>(1000 / (rootNote.frequency *  Math.pow(2, semitoneOffset / 12)));
   const [musicalDelayTime, setMusicalDelayTime] = useState<number>(timePerCycle * multiplier);
   const [beatTime, setBeatTime] = useState<number>(60000 / tempo);
   const [beatRatio, setBeatRatio] = useState<number>(musicalDelayTime / beatTime);
 
   // useEffect hook to recalculate values when tempo, root note, or multiplier changes
   useEffect(() => {
-    setFrequency(rootNote.frequency * octaveMultiplier);
-    setTimePerCycle(1000 / (rootNote.frequency * octaveMultiplier));
-    setMusicalDelayTime((1000 / (rootNote.frequency * octaveMultiplier)) * multiplier);
+    setFrequency(rootNote.frequency * Math.pow(2, semitoneOffset / 12));
+    setTimePerCycle(1000 / (rootNote.frequency * Math.pow(2, semitoneOffset / 12)));
+    setMusicalDelayTime((1000 / (rootNote.frequency * Math.pow(2, semitoneOffset / 12))) * multiplier);
     setBeatTime(60000 / tempo);
-  }, [tempo, rootNote, multiplier, octaveMultiplier]);
+  }, [tempo, rootNote, multiplier, semitoneOffset]);
 
   // useEffect hook to recalculate beat ratio when musicalDelayTime or beatTime changes
   useEffect(() => {
@@ -69,11 +69,11 @@ export default function Home() {
     }
   };
 
-    // Handler for octave multiplier input change
-    const handleOctaveMultiplierChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // Handler for semitone offset input change
+    const handleSemitoneOffsetChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       const value = parseFloat(event.target.value);
-      if (!isNaN(value) && value >= 0.25 && value <= 4) {
-        setOctaveMultiplier(value);
+      if (!isNaN(value) && value >= -12 && value <= 12) {
+        setSemitoneOffset(value);
       }
     };
 
@@ -82,7 +82,7 @@ export default function Home() {
     setTempo(initialTempo);
     setRootNote(initialRootNote);
     setMultiplier(initialMultiplier);
-      setOctaveMultiplier(initialOctaveMultiplier);
+      setSemitoneOffset(initialSemitoneOffset);
   };
 
   const handleTempoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -174,28 +174,28 @@ export default function Home() {
                 </div>
               </div>
 
-               {/* Octave Multiplier Input */}
+               {/* Semitone Offset Input */}
                <div className="grid gap-2">
-                <Label htmlFor="octaveMultiplier">Octave Multiplier</Label>
+                <Label htmlFor="semitoneOffset">Semitone Offset</Label>
                 <div className="flex items-center space-x-2">
                   <Slider
-                    id="octaveMultiplier"
-                    min={0.25}
-                    max={4}
-                    step={0.05}
-                    defaultValue={[octaveMultiplier]}
-                    onValueChange={(value) => setOctaveMultiplier(value[0])}
-                    aria-label="Octave Multiplier"
+                    id="semitoneOffset"
+                    min={-12}
+                    max={12}
+                    step={1}
+                    defaultValue={[semitoneOffset]}
+                    onValueChange={(value) => setSemitoneOffset(value[0])}
+                    aria-label="Semitone Offset"
                   />
                   <Input
                     type="number"
-                    id="octaveMultiplier-input"
+                    id="semitoneOffset-input"
                     className="w-20"
-                    value={octaveMultiplier.toString()}
-                    onChange={handleOctaveMultiplierChange}
-                    min={0.25}
-                    max={4}
-                    step={0.01}
+                    value={semitoneOffset.toString()}
+                    onChange={handleSemitoneOffsetChange}
+                    min={-12}
+                    max={12}
+                    step={1}
                   />
                 </div>
               </div>
