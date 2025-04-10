@@ -1,5 +1,6 @@
 "use client";
 import type { Mode } from "@/lib/scale";
+import clsx from "clsx";
 import { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -239,13 +240,16 @@ export default function Home() {
 
 
     const PianoKey = ({ note, midiNote, frequency, isBlack, isSelected }: { note: string; midiNote: number; frequency: number; isBlack: boolean; isSelected: boolean }) => {
+        
+        
         const keyWidth = isBlack ? '1.5rem' : '2rem';
         const keyHeight = isBlack ? '3rem' : '5rem';
-        const keyClass = isBlack ? 'bg-black text-white' : 'bg-white text-black border-2 border-gray-200';
+        const keyClass = isBlack ? 'bg-black text-white z-10 relative mx-[1px]' : 'bg-white text-black border-2 border-gray-200 relative mx-[1px]';
         const selectedClass = isSelected ? 'bg-accent text-accent-foreground' : 'hover:bg-accent hover:text-accent-foreground';
-        const lockedClass = isSelected ? 'ring-2 ring-accent ring-inset' : '';
 
-        return (
+        const isLocked = false;
+
+        return (        
             <button
                 className={`relative z-10 ${keyClass} ${selectedClass} ${lockedClass} focus:outline-none`}
                 style={{ width: keyWidth, height: keyHeight }}
@@ -307,12 +311,12 @@ export default function Home() {
         <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
             <main className="flex flex-col items-center justify-center flex-1 px-4 sm:px-20 text-center gap-8">
                 <h1 className="text-2xl md:text-4xl font-bold text-teal-800 mb-4">
-                💎 FreqLock™
+                    💎 FreqLock™
                 </h1>
-                 <h2 className="text-lg md:text-2xl font-bold text-teal-800 mb-4">🔊🎚️ Harmonic Delay Calculator for Tuned Echo Perfection</h2>
+                <h2 className="text-lg md:text-2xl font-bold text-teal-800 mb-4">🔊🎚️ Harmonic Delay Calculator for Tuned Echo Perfection</h2>
 
-                <section className="w-full max-w-md">
-                    {/* Input Section */}
+                <section className="flex flex-col gap-y-6">
+                 {/* Input Section */}
                     <Card className="mb-4">
                         <CardHeader>
                             <CardTitle>Input Parameters</CardTitle>
@@ -347,10 +351,13 @@ export default function Home() {
                             {/* Root Note Selection */}
                             <div className="grid gap-2">
                                 <Label>Root Note</Label>
-                                <div className="flex justify-center items-center py-2 max-w-md">
+                                <div className="flex justify-center items-center py-2">
                                     {/* Piano Keyboard */}
-                                    <div className="flex">
-                                    {musicalNotes.map((note) => {
+                                    <div className="flex overflow-x-auto" style={{ width: 'fit-content', minWidth: '400px' }}>                                        
+
+
+
+                                        {musicalNotes.map((note) => {
                                             const isBlackKey = note.note.includes("#") || note.note.includes("b");
                                             const isSelected = rootNote.note === note.note;
                                             return (
@@ -365,7 +372,7 @@ export default function Home() {
                                             );
                                         })}
                                     </div>
-                                </div>
+                                </div>                                
                             </div>
 
                             {/* Semitone Offset Input */}
@@ -441,7 +448,7 @@ export default function Home() {
                     </Card>
 
                     {/* Output Section */}                  
-                    <Card>
+                    <Card className="max-w-md">
                         <CardHeader>
                             <CardTitle>Calculated Results</CardTitle>
                         </CardHeader>
@@ -460,7 +467,7 @@ export default function Home() {
                             </div>
                             <div className="grid gap-2">
                                 <Label>1 Beat:</Label>
-                                <div className="text-lg font-semibold text-lime-500">{Number(beatTime).toFixed(2)} ms</div>
+                                <div className="text-lg font-semibold text-lime-500">{Number(beatTime).toFixed(2)} ms</div>                                
                             </div>
                             <div className="grid gap-2">
                                 <Label>Comparison to Beat Divisions:</Label>
@@ -486,7 +493,7 @@ export default function Home() {
                     </Card>
 
                     {/* Scales Section */}
-                    <Card className="mb-4 max-w-md">
+                    <Card className="mb-4">
                         <CardHeader>
                             <CardTitle>Scale Generator</CardTitle>
                         </CardHeader>
@@ -513,8 +520,8 @@ export default function Home() {
                         </CardContent>
                     </Card>
 
-                    {/* Chords Section */}                    
-                    <Card>
+                    {/* Chords Section */}
+                    <Card className="mb-4 max-w-md">
                         <CardHeader>
                             <CardTitle>Chord Library</CardTitle>
                         </CardHeader>
@@ -563,7 +570,7 @@ const noteFrequencies: { [key: string]: number } = {
 
 function getNoteIndex(note: string):number {
         const sanitizedNote = note.replace(/b/g, "#");
-    
+
         let index = notes.indexOf(sanitizedNote);
         
         return index;
@@ -587,10 +594,10 @@ const chordPatterns = {
         if (rootIndex === -1) return [];
     
         const chordNotes = pattern.map(interval => {
-            const transposedIndex = (rootIndex + interval) % 12;
-            return notes[transposedIndex];
-        });    
-        return chordNotes;
+        const transposedIndex = (rootIndex + interval) % 12;
+        return notes[transposedIndex];
+    });
+    return chordNotes;
     }
 
 function getFrequencies(notesArr: string[]) {
