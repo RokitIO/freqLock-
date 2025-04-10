@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
@@ -42,9 +42,6 @@ const musicalNotes: MusicalNote[] = [
 ];
 
 export default function Home() {
-  // Ref for the tempo input element
-  const tempoInputRef = useRef<HTMLInputElement>(null);
-
   // State variables for tempo, root note, multiplier, and calculated values
   const [tempo, setTempo] = useState<number | undefined>(120);
   const [rootNote, setRootNote] = useState<MusicalNote>(musicalNotes[6]); // Default to G3
@@ -80,16 +77,19 @@ export default function Home() {
     }
   };
 
+    // Handler for multiplier input change
+    const handleMultiplierChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const value = parseFloat(event.target.value);
+      if (!isNaN(value) && value >= 0.25 && value <= 4) {
+          setMultiplier(value);
+      }
+  };
+
   // Handler for resetting the input fields
   const handleReset = () => {
     setTempo(120);
     setRootNote(musicalNotes[6]);
     setMultiplier(1);
-
-    // Programmatically set the tempo input value to 120
-    if (tempoInputRef.current) {
-      tempoInputRef.current.value = '120';
-    }
   };
 
   return (
@@ -114,7 +114,6 @@ export default function Home() {
                   placeholder="Enter BPM"
                   value={tempo !== undefined ? tempo.toString() : ''}
                   onChange={handleTempoChange}
-                  ref={tempoInputRef}
                   aria-label="Tempo in beats per minute"
                 />
               </div>
@@ -141,17 +140,26 @@ export default function Home() {
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="multiplier">Multiplier</Label>
-                <Slider
-                  id="multiplier"
-                  min={0.25}
-                  max={4}
-                  step={0.25}
-                  defaultValue={[multiplier]}
-                  onValueChange={(value) => setMultiplier(value[0])}
-                  aria-label="Multiplier for delay time"
-                />
-                <div className="text-sm text-muted-foreground">
-                  {multiplier}x
+                <div className="flex items-center space-x-2">
+                  <Slider
+                    id="multiplier"
+                    min={0.25}
+                    max={4}
+                    step={0.05}
+                    defaultValue={[multiplier]}
+                    onValueChange={(value) => setMultiplier(value[0])}
+                    aria-label="Multiplier for delay time"
+                  />
+                  <Input
+                      type="number"
+                      id="multiplier-input"
+                      className="w-20"
+                      value={multiplier.toString()}
+                      onChange={handleMultiplierChange}
+                      min={0.25}
+                      max={4}
+                      step={0.01}
+                  />
                 </div>
               </div>
               <Button type="button" onClick={handleReset}>
