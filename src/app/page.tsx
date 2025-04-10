@@ -250,7 +250,7 @@ export default function Home() {
                     id="semitoneOffset"
                     min={-24}
                     max={24}
-                    step={12}
+                    step={1}
                     defaultValue={[semitoneOffset]}
                     onValueChange={(value) => setSemitoneOffset(value[0])}
                     aria-label="Semitone Offset"
@@ -263,7 +263,7 @@ export default function Home() {
                     onChange={handleSemitoneOffsetChange}
                     min={-24}
                     max={24}
-                    step={12}
+                    step={1}
                   />
                 </div>
               </div>
@@ -333,3 +333,4 @@ export default function Home() {
     </div>
   );
 }
+
