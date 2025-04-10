@@ -14,67 +14,18 @@ import { cn } from "@/lib/utils";
 // 1. CONFIGS & DATASETS
 // ----------------------
 
-// Chakra tones mapped to keys (7-tone system)
 const chakraModes = {
-    "C": {
-        chakra: "Root",
-        color: "Red",
-        westernFreq: 130.81,
-        solfeggioFreq: 396,
-        energy: "Grounding | Stability | Presence"
-    },
-    "D": {
-        chakra: "Sacral",
-        color: "Orange",
-        westernFreq: 146.83,
-        solfeggioFreq: 417,
-        energy: "Creativity | Sensuality | Pleasure"
-    },
-    "E": {
-        chakra: "Solar Plexus",
-        color: "Yellow",
-        westernFreq: 164.81,
-        solfeggioFreq: 528,
-        energy: "Willpower | Confidence | Energy"
-    },
-    "F": {
-        chakra: "Heart",
-        color: "Green",
-        westernFreq: 174.61,
-        solfeggioFreq: 639,
-        energy: "Love | Compassion | Healing"
-    },
-    "G": {
-        chakra: "Throat",
-        color: "Blue",
-        westernFreq: 196.00,
-        solfeggioFreq: 741,
-        energy: "Truth | Voice | Resonance"
-    },
-    "A": {
-        chakra: "Third Eye",
-        color: "Indigo",
-        westernFreq: 220.00,
-        solfeggioFreq: 852,
-        energy: "Intuition | Insight | Wisdom"
-    },
-    "B": {
-        chakra: "Crown",
-        color: "Violet",
-        westernFreq: 246.94,
-        solfeggioFreq: 963,
-        energy: "Spirituality | Enlightenment | Connection"
-    }
+    "C": { chakra: "Root", color: "Red", westernFreq: 130.81, solfeggioFreq: 396, energy: "Grounding | Stability | Presence" },
+    "D": { chakra: "Sacral", color: "Orange", westernFreq: 146.83, solfeggioFreq: 417, energy: "Creativity | Sensuality | Pleasure" },
+    "E": { chakra: "Solar Plexus", color: "Yellow", westernFreq: 164.81, solfeggioFreq: 528, energy: "Willpower | Confidence | Energy" },
+    "F": { chakra: "Heart", color: "Green", westernFreq: 174.61, solfeggioFreq: 639, energy: "Love | Compassion | Healing" },
+    "G": { chakra: "Throat", color: "Blue", westernFreq: 196.00, solfeggioFreq: 741, energy: "Truth | Voice | Resonance" },
+    "A": { chakra: "Third Eye", color: "Indigo", westernFreq: 220.00, solfeggioFreq: 852, energy: "Intuition | Insight | Wisdom" },
+    "B": { chakra: "Crown", color: "Violet", westernFreq: 246.94, solfeggioFreq: 963, energy: "Spirituality | Enlightenment | Connection" }
 };
 
-// Define the type for a musical note
-interface MusicalNote {
-    note: string;
-    midiNote: number;
-    frequency: number;
-}
+interface MusicalNote { note: string; midiNote: number; frequency: number; }
 
-// List of musical notes for one octave (C3 to C4)
 const musicalNotes: MusicalNote[] = [
     { note: "C3", midiNote: 48, frequency: 130.81 },
     { note: "C#3/Db3", midiNote: 49, frequency: 138.59 },
@@ -92,37 +43,17 @@ const musicalNotes: MusicalNote[] = [
 ];
 
 const initialTempo = 120;
-const initialRootNote = musicalNotes[0]; // Default to C3
+const initialRootNote = musicalNotes[0];
 const initialMultiplier = 1;
 const initialSemitoneOffset = 0;
-const initialBeatDivisionIndex = 11; // Index of "1/4 note"
+const initialBeatDivisionIndex = 11;
 
 const beatDivisions = [
-    "64x",
-    "32x",
-    "16x",
-    "8x",
-    "4x",
-    "2x Dotted 1/2 note",
-    "2x",
-    "Dotted 1/2 note",
-    "1/2 note",
-    "1/2 note triplets",
-    "Dotted 1/4 note",
-    "1/4 note",
-    "1/4 note triplets",
-    "Dotted 1/8 note",
-    "1/8 note",
-    "1/8 note triplets",
-    "Dotted 1/16 note",
-    "1/16 note",
-    "1/16 note triplets",
-    "Dotted 1/32 note",
-    "1/32 note",
-    "1/32 note triplets",
-    "Dotted 1/64 note",
-    "1/64 note",
-    "1/64 note triplets"
+    "64x", "32x", "16x", "8x", "4x", "2x Dotted 1/2 note", "2x", "Dotted 1/2 note",
+    "1/2 note", "1/2 note triplets", "Dotted 1/4 note", "1/4 note", "1/4 note triplets",
+    "Dotted 1/8 note", "1/8 note", "1/8 note triplets", "Dotted 1/16 note", "1/16 note",
+    "1/16 note triplets", "Dotted 1/32 note", "1/32 note", "1/32 note triplets",
+    "Dotted 1/64 note", "1/64 note", "1/64 note triplets"
 ];
 
 const multipliers = [
@@ -141,25 +72,39 @@ const multipliers = [
 // 2. UTILITY FUNCTIONS
 // ----------------------
 
-// MIDI note to frequency converter
-function midiToFreq(midiNote: number): number {
-    return 440 * Math.pow(2, (midiNote - 69) / 12);
-}
+const beatDivisionToMultiplier = (beatDivision: string): number => {
+    switch (beatDivision) {
+        case "64x": return 64;
+        case "32x": return 32;
+        case "16x": return 16;
+        case "8x": return 8;
+        case "4x": return 4;
+        case "2x Dotted 1/2 note": return 1.5;
+        case "2x": return 2;
+        case "Dotted 1/2 note": return 0.75;
+        case "1/2 note": return 0.5;
+        case "1/2 note triplets": return 1 / 3;
+        case "Dotted 1/4 note": return 0.375;
+        case "1/4 note": return 0.25;
+        case "1/4 note triplets": return 1 / 6;
+        case "Dotted 1/8 note": return 0.1875;
+        case "1/8 note": return 0.125;
+        case "1/8 note triplets": return 1 / 12;
+        case "Dotted 1/16 note": return 0.09375;
+        case "1/16 note": return 0.0625;
+        case "1/16 note triplets": return 1 / 24;
+        case "Dotted 1/32 note": return 0.046875;
+        case "1/32 note": return 0.03125;
+        case "1/32 note triplets": return 1 / 48;
+        case "Dotted 1/64 note": return 0.0234375;
+        case "1/64 note": return 0.015625;
+        case "1/64 note triplets": return 1 / 96;
+        default: return 0.25;
+    }
+};
 
-// Round to nearest master number
-function closestMasterNumber(bpm: number): number {
-    return masterNumbers.reduce((closest, num) =>
-        Math.abs(num - bpm) < Math.abs(closest - bpm) ? num : closest
-    );
-}
-
-// Find chakra tone from root note
-function matchChakra(rootNote: string): string {
-    const tone = rootNote[0]; // First letter of note
-    return chakraMap[tone] || "Unknown Chakra";
-}
-
-// React functional component for the Home page
+// ----------------------
+// 3. React functional component for the Home page
 export default function Home() {
     // State variables using the useState hook
     const [tempo, setTempo] = useState<number>(initialTempo);
@@ -172,139 +117,43 @@ export default function Home() {
 
     const [frequency, setFrequency] = useState<number>(initialRootNote.frequency);
     const [timePerCycle, setTimePerCycle] = useState<number>(1000 / initialRootNote.frequency);
-    const [musicalDelayTime, setMusicalDelayTime] = useState<number>(timePerCycle * multiplier);
-    const [beatTime, setBeatTime] = useState<number>(60000 / tempo);
-    const [beatRatio, setBeatRatio] = useState<number>(musicalDelayTime / beatTime);
-    const [closestNoteDivision, setClosestNoteDivision] = useState<string>(getClosestNoteDivision(beatRatio));
+    const [musicalDelayTime, setMusicalDelayTime] = useState<number>(initialMultiplier * (1000 / initialRootNote.frequency));
+    const [beatTime, setBeatTime] = useState<number>(60000 / initialTempo);
+    const [beatRatio, setBeatRatio] = useState<number>((initialMultiplier * (1000 / initialRootNote.frequency)) / (60000 / initialTempo));
+    const [closestNoteDivision, setClosestNoteDivision] = useState<string>("");
 
     const [chakra, setChakra] = useState<string>("");
     const [chakraEnergy, setChakraEnergy] = useState<string>("");
     const [chakraColor, setChakraColor] = useState<string>("");
-    const [useSolfeggio, setUseSolfeggio] = useState<boolean>(false);
 
-    const [multiplierLabel, setMultiplierLabel] = useState<string>(multipliers[2].label);
-
-    // useEffect hook to recalculate values when tempo, root note, or multiplier changes
+    // Recalculate values whenever inputs change
     useEffect(() => {
-        recalculateValues();
-    }, [tempo, rootNote, multiplier, semitoneOffset, selectedMultiplier, useHarmonicMultiples, useSolfeggio, beatDivisionIndex]);
-
-    const recalculateValues = () => {
-        // Chakra and Solfeggio frequencies
-        const chakraData = chakraModes[rootNote.note[0]];
-        const baseFrequency = chakraData
-            ? useSolfeggio
-                ? chakraData.solfeggioFreq
-                : rootNote.frequency
-            : rootNote.frequency;
-
-        // Calculate frequency based on root note and semitone offset
-        const newFrequency = baseFrequency * Math.pow(2, semitoneOffset / 12);
-        setFrequency(newFrequency);
-
+        const newFrequency = rootNote.frequency * Math.pow(2, semitoneOffset / 12);
         const newTimePerCycle = 1000 / newFrequency;
-        setTimePerCycle(newTimePerCycle);
-
-        const selectedMultiplierValue = useHarmonicMultiples ? selectedMultiplier : multiplier;
+        const selectedMultiplierValue = useHarmonicMultiples ? selectedMultiplier : beatDivisionToMultiplier(beatDivisions[beatDivisionIndex]);
         const newMusicalDelayTime = newTimePerCycle * selectedMultiplierValue;
-        setMusicalDelayTime(newMusicalDelayTime);
-
-        // Calculate beat time
         const newBeatTime = 60000 / tempo;
-        setBeatTime(newBeatTime);
-
         const newBeatRatio = newMusicalDelayTime / newBeatTime;
+
+        setFrequency(newFrequency);
+        setTimePerCycle(newTimePerCycle);
+        setMusicalDelayTime(newMusicalDelayTime);
+        setBeatTime(newBeatTime);
         setBeatRatio(newBeatRatio);
         setClosestNoteDivision(getClosestNoteDivision(newBeatRatio));
 
-        // Set Chakra properties
+        const chakraData = chakraModes[rootNote.note[0]];
         setChakra(chakraData ? chakraData.chakra : "Unknown");
         setChakraEnergy(chakraData ? chakraData.energy : "Unknown");
         setChakraColor(chakraData ? chakraData.color : "grey");
-    };
+    }, [tempo, rootNote, multiplier, semitoneOffset, selectedMultiplier, useHarmonicMultiples, beatDivisionIndex]);
 
-    useEffect(() => {
-        const newBeatRatio = musicalDelayTime / beatTime;
-        setBeatRatio(newBeatRatio);
-        setClosestNoteDivision(getClosestNoteDivision(newBeatRatio));
-    }, [musicalDelayTime, beatTime]);
-
-    // Handler for semitone offset input change
+    // Handlers
     const handleSemitoneOffsetChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = parseFloat(event.target.value);
         if (!isNaN(value) && value >= -24 && value <= 24) {
             setSemitoneOffset(value);
         }
-    };
-
-    // Function to convert beat division/multiple to a multiplier
-    const beatDivisionToMultiplier = (beatDivision: string): number => {
-        switch (beatDivision) {
-            case "64x":
-                return 64;
-            case "32x":
-                return 32;
-            case "16x":
-                return 16;
-            case "8x":
-                return 8;
-            case "4x":
-                return 4;
-            case "2x Dotted 1/2 note":
-                return 1.5;
-            case "2x":
-                return 2;
-            case "Dotted 1/2 note":
-                return 0.75;
-            case "1/2 note":
-                return 0.5;
-            case "1/2 note triplets":
-                return 1 / 3;
-            case "Dotted 1/4 note":
-                return 0.375;
-            case "1/4 note":
-                return 0.25;
-            case "1/4 note triplets":
-                return 1 / 6;
-            case "Dotted 1/8 note":
-                return 0.1875;
-            case "1/8 note":
-                return 0.125;
-            case "1/8 note triplets":
-                return 1 / 12;
-            case "Dotted 1/16 note":
-                return 0.09375;
-            case "1/16 note":
-                return 0.0625;
-            case "1/16 note triplets":
-                return 1 / 24;
-            case "Dotted 1/32 note":
-                return 0.046875;
-            case "1/32 note":
-                return 0.03125;
-            case "1/32 note triplets":
-                return 1 / 48;
-            case "Dotted 1/64 note":
-                return 0.0234375;
-            case "1/64 note":
-                return 0.015625;
-            case "1/64 note triplets":
-                return 1 / 96;
-            default:
-                return 0.25; // Default to 1/4 note
-        }
-    };
-
-    // Handler for resetting the input fields
-    const handleReset = () => {
-        setTempo(initialTempo);
-        setRootNote(initialRootNote);
-        setMultiplier(initialMultiplier);
-        setSemitoneOffset(initialSemitoneOffset);
-        setBeatDivisionIndex(initialBeatDivisionIndex);
-        setSelectedMultiplier(multipliers[2].value);
-        setUseHarmonicMultiples(false);
-        setUseSolfeggio(false);
     };
 
     const handleTempoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -314,13 +163,30 @@ export default function Home() {
         }
     };
 
-    // Piano key component
+    const handleReset = () => {
+        setTempo(initialTempo);
+        setRootNote(initialRootNote);
+        setMultiplier(initialMultiplier);
+        setSemitoneOffset(initialSemitoneOffset);
+        setBeatDivisionIndex(initialBeatDivisionIndex);
+        setSelectedMultiplier(multipliers[2].value);
+        setUseHarmonicMultiples(false);
+    };
+
+    const handleMultiplierChange = (value: number[]) => {
+        if (value && value.length > 0) {
+            const index = Math.round(value[0]);
+            setBeatDivisionIndex(index);
+            setMultiplier(beatDivisionToMultiplier(beatDivisions[index]));
+        }
+    };
+
     const PianoKey = ({ note, midiNote, frequency, isBlack, isSelected }: { note: string; midiNote: number; frequency: number; isBlack: boolean; isSelected: boolean }) => {
-        const keyWidth = isBlack ? '1.5rem' : '2rem'; // Slightly narrower keys
+        const keyWidth = isBlack ? '1.5rem' : '2rem';
         const keyHeight = isBlack ? '3rem' : '5rem';
         const keyClass = isBlack ? 'bg-black text-white' : 'bg-white text-black border-2 border-gray-200';
         const selectedClass = isSelected ? 'bg-accent text-accent-foreground' : 'hover:bg-accent hover:text-accent-foreground';
-        const lockedClass = isSelected ? 'ring-2 ring-accent ring-inset' : ''; // Add ring only when selected
+        const lockedClass = isSelected ? 'ring-2 ring-accent ring-inset' : '';
 
         return (
             <button
@@ -331,14 +197,6 @@ export default function Home() {
                 <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs">{note}</span>
             </button>
         );
-    };
-
-    const handleMultiplierChange = (value: number[]) => {
-        if (value && value.length > 0) {
-            const index = Math.round(value[0]);
-            setBeatDivisionIndex(index);
-            setMultiplier(beatDivisionToMultiplier(beatDivisions[index]));
-        }
     };
 
     // Function to get the closest musical note division
@@ -356,52 +214,6 @@ export default function Home() {
             Math.abs(curr.value - ratio) < Math.abs(prev.value - ratio) ? curr : prev
         );
         return closest.label;
-    }
-
-    // ----------------------
-    // 3. MAIN CALCULATOR
-    // ----------------------
-
-    function calculateHarmonicDelay() {
-        // Chakra and Solfeggio frequencies
-        const chakraData = chakraModes[rootNote.note[0]];
-        const baseFrequency = chakraData
-            ? useSolfeggio
-                ? chakraData.solfeggioFreq
-                : rootNote.frequency
-            : rootNote.frequency;
-
-        // Calculate frequency based on root note and semitone offset
-        const newFrequency = baseFrequency * Math.pow(2, semitoneOffset / 12);
-        setFrequency(newFrequency);
-
-        const newTimePerCycle = 1000 / newFrequency;
-        setTimePerCycle(newTimePerCycle);
-
-        const selectedMultiplierValue = useHarmonicMultiples ? selectedMultiplier : multiplier;
-        const newMusicalDelayTime = newTimePerCycle * selectedMultiplierValue;
-        setMusicalDelayTime(newMusicalDelayTime);
-
-        // Calculate beat time
-        const newBeatTime = 60000 / tempo;
-        setBeatTime(newBeatTime);
-
-        const newBeatRatio = newMusicalDelayTime / newBeatTime;
-        setBeatRatio(newBeatRatio);
-        setClosestNoteDivision(getClosestNoteDivision(newBeatRatio));
-
-        // Set Chakra properties
-        setChakra(chakraData ? chakraData.chakra : "Unknown");
-        setChakraEnergy(chakraData ? chakraData.energy : "Unknown");
-        setChakraColor(chakraData ? chakraData.color : "grey");
-
-        return {
-            frequency: newFrequency,
-            timePerCycle: newTimePerCycle,
-            musicalDelayTime: newMusicalDelayTime,
-            beatTime: newBeatTime,
-            beatRatio: newBeatRatio
-        };
     }
 
     return (
@@ -595,7 +407,6 @@ export default function Home() {
         </div>
     );
 
-    // Function to get the closest musical note division
     function getClosestNoteDivision(ratio: number): string {
         const divisions = [
             { label: "1/1", value: 1 },
@@ -612,6 +423,3 @@ export default function Home() {
         return closest.label;
     }
 }
-
-
-
