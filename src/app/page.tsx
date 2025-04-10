@@ -34,6 +34,7 @@ const initialTempo = 120;
 const initialRootNote = musicalNotes[0]; // Default to C3
 const initialMultiplier = 0.25;
 const initialSemitoneOffset = 0;
+const initialBeatDivisionIndex = 4; // Index of "1/4 note"
 
 const beatDivisions = [
     "Dotted 1/2 note",
@@ -68,6 +69,7 @@ export default function Home() {
   const [musicalDelayTime, setMusicalDelayTime] = useState<number>(timePerCycle * multiplier);
   const [beatTime, setBeatTime] = useState<number>(60000 / tempo);
   const [beatRatio, setBeatRatio] = useState<number>(musicalDelayTime / beatTime);
+  const [beatDivisionIndex, setBeatDivisionIndex] = useState<number>(initialBeatDivisionIndex);
 
   // useEffect hook to recalculate values when tempo, root note, or multiplier changes
   useEffect(() => {
@@ -139,7 +141,8 @@ export default function Home() {
     setTempo(initialTempo);
     setRootNote(initialRootNote);
     setMultiplier(initialMultiplier);
-      setSemitoneOffset(initialSemitoneOffset);
+    setSemitoneOffset(initialSemitoneOffset);
+    setBeatDivisionIndex(initialBeatDivisionIndex);
   };
 
   const handleTempoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -171,6 +174,7 @@ export default function Home() {
     const handleMultiplierChange = (value: number[]) => {
       if (value && value.length > 0) {
         const index = Math.round(value[0]);
+        setBeatDivisionIndex(index);
         setMultiplier(beatDivisionToMultiplier(beatDivisions[index]));
       }
     };
@@ -272,7 +276,7 @@ export default function Home() {
                   min={0}
                   max={beatDivisions.length - 1}
                   step={1}
-                  defaultValue={[beatDivisions.indexOf("1/4 note")]}
+                  defaultValue={[beatDivisionIndex]}
                   onValueChange={(value) => {
                     if (value && value.length > 0) {
                       handleMultiplierChange(value);
@@ -284,7 +288,7 @@ export default function Home() {
                   type="text"
                   id="multiplier-input"
                   className="w-full"
-                  value={beatDivisions[beatDivisions.findIndex(division => beatDivisionToMultiplier(division) === multiplier)] || "1/4 note"}
+                  value={beatDivisions[beatDivisionIndex] || "1/4 note"}
                   readOnly
                 />
               </div>
