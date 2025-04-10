@@ -73,7 +73,7 @@ export default function Home() {
   useEffect(() => {
     setFrequency(rootNote.frequency * Math.pow(2, semitoneOffset / 12));
     setTimePerCycle(1000 / (rootNote.frequency * Math.pow(2, semitoneOffset / 12)));
-    setMusicalDelayTime((1000 / (rootNote.frequency * Math.pow(2, semitoneOffset / 12))) * multiplier);
+    setMusicalDelayTime((60000 / tempo) * multiplier); // Corrected formula
     setBeatTime(60000 / tempo);
   }, [tempo, rootNote, multiplier, semitoneOffset]);
 
@@ -284,7 +284,7 @@ export default function Home() {
                   type="text"
                   id="multiplier-input"
                   className="w-full"
-                  value={beatDivisions[Math.round(multiplier/beatDivisionToMultiplier("1/4 note")*(beatDivisions.length -1))] || "1/4 note"}
+                  value={beatDivisions[beatDivisions.findIndex(division => beatDivisionToMultiplier(division) === multiplier)] || "1/4 note"}
                   readOnly
                 />
               </div>
