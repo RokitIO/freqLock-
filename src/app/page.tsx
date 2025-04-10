@@ -373,21 +373,21 @@ export default function Home() {
 
         // Calculate frequency based on root note and semitone offset
         const newFrequency = baseFrequency * Math.pow(2, semitoneOffset / 12);
-        setFrequency(newFrequency.toFixed(2));
+        setFrequency(newFrequency);
 
         const newTimePerCycle = 1000 / newFrequency;
-        setTimePerCycle(newTimePerCycle.toFixed(2));
+        setTimePerCycle(newTimePerCycle);
 
         const selectedMultiplierValue = useHarmonicMultiples ? selectedMultiplier : multiplier;
         const newMusicalDelayTime = newTimePerCycle * selectedMultiplierValue;
-        setMusicalDelayTime(newMusicalDelayTime.toFixed(2));
+        setMusicalDelayTime(newMusicalDelayTime);
 
         // Calculate beat time
         const newBeatTime = 60000 / tempo;
-        setBeatTime(newBeatTime.toFixed(2));
+        setBeatTime(newBeatTime);
 
         const newBeatRatio = newMusicalDelayTime / newBeatTime;
-        setBeatRatio(newBeatRatio.toFixed(2));
+        setBeatRatio(newBeatRatio);
         setClosestNoteDivision(getClosestNoteDivision(newBeatRatio));
 
         // Set Chakra properties
@@ -548,19 +548,19 @@ export default function Home() {
                         <CardContent className="grid gap-4">
                             <div className="grid gap-2">
                                 <Label>Frequency of Root Note:</Label>
-                                <div className="text-lg font-semibold text-lime-500">{frequency} Hz</div>
+                                <div className="text-lg font-semibold text-lime-500">{Number(frequency).toFixed(2)} Hz</div>
                             </div>
                             <div className="grid gap-2">
                                 <Label>Time per Cycle:</Label>
-                                <div className="text-lg font-semibold text-lime-500">{timePerCycle} ms</div>
+                                <div className="text-lg font-semibold text-lime-500">{Number(timePerCycle).toFixed(2)} ms</div>
                             </div>
                             <div className="grid gap-2">
                                 <Label>Musical Delay Time:</Label>
-                                <div className="text-lg font-semibold text-lime-500">{musicalDelayTime} ms</div>
+                                <div className="text-lg font-semibold text-lime-500">{Number(musicalDelayTime).toFixed(2)} ms</div>
                             </div>
                             <div className="grid gap-2">
                                 <Label>1 Beat:</Label>
-                                <div className="text-lg font-semibold text-lime-500">{beatTime} ms</div>
+                                <div className="text-lg font-semibold text-lime-500">{Number(beatTime).toFixed(2)} ms</div>
                             </div>
                             <div className="grid gap-2">
                                 <Label>Comparison to Beat Divisions:</Label>
@@ -612,5 +612,6 @@ export default function Home() {
         return closest.label;
     }
 }
+
 
 
