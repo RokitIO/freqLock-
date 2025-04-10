@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Circle } from "lucide-react";
 
 // Define the type for a musical note
 interface MusicalNote {
@@ -41,41 +43,33 @@ const musicalNotes: MusicalNote[] = [
   { note: "B4", frequency: 493.88 },
 ];
 
+const initialTempo = 120;
+const initialRootNote = musicalNotes[6]; // Default to G3
+const initialMultiplier = 1;
+
 export default function Home() {
   // State variables for tempo, root note, multiplier, and calculated values
-  const [tempo, setTempo] = useState<number | undefined>(120);
-  const [rootNote, setRootNote] = useState<MusicalNote>(musicalNotes[6]); // Default to G3
-  const [multiplier, setMultiplier] = useState<number>(1);
+  const [tempo, setTempo] = useState<number>(initialTempo);
+  const [rootNote, setRootNote] = useState<MusicalNote>(initialRootNote);
+  const [multiplier, setMultiplier] = useState<number>(initialMultiplier);
   const [frequency, setFrequency] = useState<number>(rootNote.frequency);
   const [timePerCycle, setTimePerCycle] = useState<number>(1000 / rootNote.frequency);
   const [musicalDelayTime, setMusicalDelayTime] = useState<number>(timePerCycle * multiplier);
-  const [beatTime, setBeatTime] = useState<number>(60000 / (tempo || 120));
+  const [beatTime, setBeatTime] = useState<number>(60000 / tempo);
   const [beatRatio, setBeatRatio] = useState<number>(musicalDelayTime / beatTime);
 
   // useEffect hook to recalculate values when tempo, root note, or multiplier changes
   useEffect(() => {
-    // Ensure tempo is a valid number
-    const validTempo = tempo !== undefined && tempo >= 1 ? tempo : 120;
     setFrequency(rootNote.frequency);
     setTimePerCycle(1000 / rootNote.frequency);
     setMusicalDelayTime((1000 / rootNote.frequency) * multiplier);
-    setBeatTime(60000 / validTempo);
+    setBeatTime(60000 / tempo);
   }, [tempo, rootNote, multiplier]);
 
   // useEffect hook to recalculate beat ratio when musicalDelayTime or beatTime changes
   useEffect(() => {
     setBeatRatio(musicalDelayTime / beatTime);
   }, [musicalDelayTime, beatTime]);
-
-  // Handler for tempo input change
-  const handleTempoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(event.target.value);
-    if (!isNaN(value) && value >= 1) {
-      setTempo(value);
-    } else {
-      setTempo(undefined);
-    }
-  };
 
     // Handler for multiplier input change
     const handleMultiplierChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,10 +81,19 @@ export default function Home() {
 
   // Handler for resetting the input fields
   const handleReset = () => {
-    setTempo(120);
-    setRootNote(musicalNotes[6]);
-    setMultiplier(1);
+    setTempo(initialTempo);
+    setRootNote(initialRootNote);
+    setMultiplier(initialMultiplier);
   };
+
+  const NoteButton = ({ note, frequency }: { note: string; frequency: number }) => (
+    <button
+      className="flex-1 p-2 rounded font-semibold text-sm text-center bg-secondary hover:bg-accent text-accent-foreground"
+      onClick={() => setRootNote({ note, frequency })}
+    >
+      {note}
+    </button>
+  );
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
@@ -106,38 +109,52 @@ export default function Home() {
               <CardTitle>Input Parameters</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4">
-              <div className="grid gap-2">
+            <div className="grid gap-2">
                 <Label htmlFor="tempo">Tempo (BPM)</Label>
-                <Input
-                  type="number"
-                  id="tempo"
-                  placeholder="Enter BPM"
-                  value={tempo !== undefined ? tempo.toString() : ''}
-                  onChange={handleTempoChange}
-                  aria-label="Tempo in beats per minute"
-                />
+                <div className="flex items-center space-x-2">
+                  <Slider
+                    id="tempo"
+                    min={30}
+                    max={240}
+                    step={1}
+                    defaultValue={[tempo]}
+                    onValueChange={(value) => setTempo(value[0])}
+                    aria-label="Tempo in beats per minute"
+                  />
+                  <Input
+                      type="number"
+                      id="tempo-input"
+                      className="w-20"
+                      value={tempo.toString()}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value);
+                        if (!isNaN(value) && value >= 30 && value <= 240) {
+                          setTempo(value);
+                        }
+                      }}
+                      min={30}
+                      max={240}
+                      step={1}
+                  />
+                </div>
               </div>
+
               <div className="grid gap-2">
-                <Label htmlFor="rootNote">Root Note</Label>
-                <select
-                  id="rootNote"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  value={rootNote.note}
-                  onChange={(e) => {
-                    const selectedNote = musicalNotes.find(note => note.note === e.target.value);
-                    if (selectedNote) {
-                      setRootNote(selectedNote);
-                    }
-                  }}
-                  aria-label="Root Note"
-                >
-                  {musicalNotes.map((note) => (
-                    <option key={note.note} value={note.note}>
-                      {note.note} ({note.frequency.toFixed(2)} Hz)
-                    </option>
-                  ))}
-                </select>
+                <Label>Root Note</Label>
+                <Sheet>
+                  <SheetTrigger className="w-full flex items-center justify-center h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                    {rootNote.note} ({rootNote.frequency.toFixed(2)} Hz)
+                  </SheetTrigger>
+                  <SheetContent className="grid gap-4 p-4">
+                    <div className="grid grid-cols-6 gap-2">
+                      {musicalNotes.map((note) => (
+                        <NoteButton key={note.note} note={note.note} frequency={note.frequency} />
+                      ))}
+                    </div>
+                  </SheetContent>
+                </Sheet>
               </div>
+
               <div className="grid gap-2">
                 <Label htmlFor="multiplier">Multiplier</Label>
                 <div className="flex items-center space-x-2">
