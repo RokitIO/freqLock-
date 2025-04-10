@@ -27,9 +27,6 @@ const chakraMap = {
 // Master numbers (numerology)
 const masterNumbers = [11, 22, 33, 44, 55, 66, 77, 88, 99, 111];
 
-// Common angel number intervals in Hz
-const angelIntervals = [111, 222, 333, 444, 555, 666, 777, 888, 999];
-
 // Define the type for a musical note
 interface MusicalNote {
   note: string;
@@ -116,11 +113,6 @@ function closestMasterNumber(bpm: number): number {
   );
 }
 
-// Find angel number match from harmonic frequencies
-function matchAngelInterval(freq: number): number | null {
-  return angelIntervals.find((a) => Math.abs(freq - a) < 1) || null;
-}
-
 // Find chakra tone from root note
 function matchChakra(rootNote: string): string {
   const tone = rootNote[0]; // First letter of note
@@ -145,9 +137,8 @@ export default function Home() {
     const [beatRatio, setBeatRatio] = useState<number>(musicalDelayTime / beatTime);
     const [closestNoteDivision, setClosestNoteDivision] = useState<string>(getClosestNoteDivision(beatRatio));
 
-    const [chakra, setChakra] = useState<string>(matchChakra(initialRootNote.note));
+    const [chakra, setChakra] = useState<string>(matchChakra(rootNote.note));
     const [masterNumber, setMasterNumber] = useState<number>(closestMasterNumber(initialTempo));
-    const [angelInterval, setAngelInterval] = useState<number | null>(matchAngelInterval(initialRootNote.frequency));
     const [beatDivisionLabel, setBeatDivisionLabel] = useState<string>(beatDivisions[initialBeatDivisionIndex]);
 
   // useEffect hook to recalculate values when tempo, root note, or multiplier changes
@@ -168,7 +159,6 @@ export default function Home() {
 
       setChakra(matchChakra(rootNote.note));
       setMasterNumber(closestMasterNumber(tempo));
-      setAngelInterval(matchAngelInterval(newFrequency));
       setBeatDivisionLabel(beatDivisions[beatDivisionIndex]);
 
       const newBeatRatio = newMusicalDelayTime / newBeatTime;
@@ -335,7 +325,7 @@ export default function Home() {
         // Matches
         setChakra(matchChakra(rootNote.note));
         setMasterNumber(closestMasterNumber(tempo));
-        setAngelInterval(matchAngelInterval(newFrequency));
+
         setBeatDivisionLabel(beatDivisions[beatDivisionIndex]);
 
         return {
@@ -521,11 +511,6 @@ export default function Home() {
                     <Label>Closest Master Number:</Label>
                     <div className="text-lg font-semibold text-lime-500">{masterNumber}</div>
                 </div>
-
-                <div className="grid gap-2">
-                    <Label>Angel Interval Match:</Label>
-                    <div className="text-lg font-semibold text-lime-500">{angelInterval ? `${angelInterval} Hz` : "No match"}</div>
-                </div>
             </CardContent>
           </Card>
         </section>
@@ -550,3 +535,4 @@ export default function Home() {
         return closest.label;
     }
 }
+
