@@ -83,14 +83,16 @@ export default function Home() {
 
   // Piano key component
   const PianoKey = ({ note, frequency, isBlack, isSelected }: { note: string; frequency: number; isBlack: boolean; isSelected: boolean }) => {
+    const keyWidth = isBlack ? '1.5rem' : '2rem'; // Slightly narrower keys
+    const keyHeight = isBlack ? '3rem' : '5rem';
     const keyClass = isBlack ? 'bg-black text-white' : 'bg-white text-black border-2 border-gray-200';
     const selectedClass = isSelected ? 'bg-accent text-accent-foreground' : 'hover:bg-accent hover:text-accent-foreground';
     const lockedClass = isSelected ? 'ring-2 ring-accent ring-inset' : ''; // Add ring only when selected
 
     return (
       <button
-        className={`relative z-10 h-8 ${keyClass} ${selectedClass} ${lockedClass} focus:outline-none`}
-        style={{ width: isBlack ? '1.75rem' : '2.5rem', height: '5rem' }}
+        className={`relative z-10 ${keyClass} ${selectedClass} ${lockedClass} focus:outline-none`}
+        style={{ width: keyWidth, height: keyHeight }}
         onClick={() => setRootNote({ note, frequency })}
       >
         <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs">{note}</span>
@@ -227,4 +229,3 @@ export default function Home() {
     </div>
   );
 }
-
